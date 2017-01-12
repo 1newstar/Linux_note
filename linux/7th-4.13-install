@@ -1,0 +1,161 @@
+
+	scp -r 
+	ssh:远程登录
+		[root@localhost test]# ssh tom@172.16.1.52	表示通过普通用户(tom)登录服务器
+		tom@172.16.1.52's password: 
+		[tom@aa ~]$ id
+		uid=500(tom) gid=500(tom) groups=500(tom),501(jim)
+
+	nfs :
+		1 挂载包源mount -> iso
+		2 配置yum
+		3 安装 yum install nfs*
+		4 配置nfs服务
+		5 重启nfs服务
+
+		客户端
+			showmount -e
+			mount
+			cp
+	http:
+=============================================
+linux软件安装：
+	1 : rpm包安装方式：
+
+	linuxqq-v1.0.2-beta1.i386.rpm
+	软件名称  版本       平台  格式
+	网络下载注意两点：
+		1 必须是.rpm格式
+		2 要看安装平台
+		3 看版本信息
+	安装命令：rpm
+		rpm -ivh 安装包包名
+			-i : 表示安装
+			-v : 表示显示安装过程
+			-h : 表示显示进度条
+	案例：
+		[root@aa tools]# rpm -ivh RealPlayer11GOLD.rpm 
+		Preparing...                                                            (100########################################### [100%]
+		   1:RealPlayer                                                         (  1########################################### [100%]
+
+	查找安装包
+		-qa: 查找所有安装包
+	
+		案例：查找real的安装包
+		[root@aa tools]# rpm -qa | grep -i real
+		RealPlayer-11.0.0.4028-20080225
+		
+		按路径查找：
+			[root@aa tools]# rpm -qf /bin/ls
+			coreutils-5.97-23.el5_4.2
+
+			[root@aa tools]# rpm -qf /opt/real/RealPlayer/realplay
+			RealPlayer-11.0.0.4028-20080225
+	卸载：
+		-e 安装包
+		案例：
+			[root@aa tools]# rpm -e RealPlayer-11.0.0.4028-20080225
+
+		
+	练习：安装qq
+
+		[root@aa tools]# rpm -ivh linuxqq-v1.0.2-beta1.i386.rpm --force
+		强制安装
+
+		如果程序非法卸载，则会造成安装不成功？但是在执行时执行不成功，这样，则需要强制类型安装或者找到包卸载再次才可以安装成功。
+
+		
+		安装办公软件
+		OpenOffice_3.2.0_Linux_zh-CN.tar.gz  压缩包
+
+		1 解压：
+			[root@aa tools]# tar -xvf OpenOffice_3.2.0_Linux_zh-CN.tar.gz 
+		2 进入解压目录
+			[root@aa tools]# cd OOO320_m12_native_packed-1_zh-CN.9483/
+			并再次进入rpm格式目录文件总
+				cd RPMS
+		3 安装所有rpm包
+			rpm -ivh *.rpm
+		4 安装桌面环境
+			[root@aa desktop-integration]# rpm -ivh openoffice.org3.2-redhat-menus-3.2-9472.noarch.rpm
+
+	=========================================
+2 ：yum 安装方式
+	安装包之间存在依赖关系 -> yum安装
+
+	1 下载rpm包存放到一个指定目录中
+	2 安装生成依赖关系工具
+		yum install createrepo*
+	3 对指定目录生成依赖
+		createrepo /yum  一定要指定到rpm包存放的上级目录
+	4 配置yum
+		/etc/yum.repos.d/rhel-debuginfo.repo
+	5 加载yum
+		yum clean all
+		yum list
+	6 安装：
+		yum install chm*  不可以在当前yum目录中操作
+	6 卸载
+		yum erase chm*
+	
+	练习：
+		通过yum安装卸载qq
+==========================================
+
+3 : 源码包安装 .c 
+	mplayer-new.tar.gz
+	1 解压：
+		tar -xvf mplayer-new.tar.gz
+	2 解压目录
+		cd mplayer
+	3 配置硬件环境
+		./configure 
+	4 编译：
+		make .c -> .o  Makefile文件中all规则  默认规则
+	5 安装：
+		make install  Makefile 文件中install规则
+	6 执行
+		mplay filename
+	7 卸载：
+		make uninstall
+	8 彻底清空
+		make clean
+	
+
+	练习： 安装ntfs格式源码包
+		1 解压
+		2 make
+		3 make install
+		4 mount -t ntfs-3g /dev/sdb1 /mnt
+		5 make uninstall
+
+		mount -t ntfs-3g 设备名 挂载点
+=========================================
+4 其他安装方式： x 可执行权限
+	案例：安装pdf格式文档为例
+		1 解压
+			tar -xvf AdobeReader_chs-8.1.3-1.i486.tar.gz
+		2 进入解压目录
+			cd AdobeReader
+		3 安装
+			./INSTALL 
+============================
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

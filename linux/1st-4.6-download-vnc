@@ -1,0 +1,164 @@
+======================================================
+尚观嵌入式20160406培训班听课笔记
+
+======================================================
+听课笔记-2016.04.06
+
+讲课老师信息
+张凯   QQ:317297515
+======================================================
+
+[root@localhost xiami]# uname -m
+i686
+[root@localhost xiami]# uname -r
+2.6.18-194.el5
+[root@localhost xiami]# uname -a
+Linux localhost.localdomain 2.6.18-194.el5 #1 SMP Tue Mar 16 21:52:43 EDT 2010 i686 i686 i386 GNU/Linux
+
+[root@localhost xiami]# lsb_release
+LSB Version:    :core-3.1-ia32:core-3.1-noarch:graphics-3.1-ia32:graphics-3.1-noarch
+[root@localhost xiami]# lsb_release -a
+LSB Version:    :core-3.1-ia32:core-3.1-noarch:graphics-3.1-ia32:graphics-3.1-noarch
+Distributor ID: RedHatEnterpriseServer
+Description:    Red Hat Enterprise Linux Server release 5.5 (Tikanga)
+Release:        5.5
+Codename:       Tikanga
+======================================================
+
+作业上传和课件下载：
+
+作业上传到 homework文件夹：
+作业文件夹命名格式为：IP_姓名
+
+[root@localhost /]# service network restart	
+	->重启网络
+
+[root@localhost /]# ifconfig eth0		
+	->查看IP地址
+
+[root@localhost /]# vim /etc/sysconfig/network-scripts/ifcfg-eth0 
+	->修改IP地址等网络信息
+
+[root@localhost /]# ping 172.16.222.113 -c 4	
+	->Ping网络主机4次，参数-c表示次数
+
+[root@localhost /]# service sshd restart
+
+[root@localhost /]# showmount -e 172.16.222.113
+Export list for 172.16.222.113:
+/ken      *
+/tools    *
+/homework *
+	->查看网络上的共享文件
+
+[root@localhost /]# mount 172.16.222.113:/ken /mnt
+You have new mail in /var/spool/mail/root
+	->将共享文件的课件文件夹/ken挂载到/mnt，/mnt目录下一般不创建子文件夹
+
+[root@localhost /]# cd /mnt
+[root@localhost mnt]# ls
+1st  2nd
+	->进入/mnt目录查看挂载后目录中的文件
+
+[root@localhost mnt]# ls -l
+total 8
+-rw-r--r-- 1 root root 6 Apr  6 10:13 1st
+-rw-r--r-- 1 root root 6 Apr  6 10:13 2nd
+
+[root@localhost mnt]# df -h
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/mapper/VolGroup00-LogVol00
+                      285G  3.0G  268G   2% /
+/dev/sda1              99M   12M   82M  13% /boot
+tmpfs                1009M     0 1009M   0% /dev/shm
+172.16.222.113:/ken    13G  4.9G  7.0G  42% /mnt
+	->查看挂载是否成功
+
+[root@localhost xiami]# umount /mnt
+	->卸载挂载点
+
+[root@localhost xiami]# cp 106_马驰原 /mnt -rf
+	->上传作业文件夹到主机homework目录，即将作业文件夹复制到主机homework目录
+======================================================
+
+安装VNC共享远程桌面：
+[root@localhost mnt]# cd /home/xiami/tools
+
+[root@localhost tools]# rpm -ivh vnc-4.1.2-14.el5_3.1.i386.rpm 
+warning: vnc-4.1.2-14.el5_3.1.i386.rpm: Header V3 DSA signature: NOKEY, key ID 37017186
+Preparing...                ########################################### [100%]
+   1:vnc                    ########################################### [100%]
+	->使用rpm安装下载好的VNC软件，
+
+[root@localhost tools]# vnc
+vncconfig  vncpasswd  vncserver  vncviewer  
+[root@localhost tools]# vncviewer 172.16.222.113
+	->用VNC工具远程连接主机，实现同屏
+======================================================
+
+[root@localhost tools]# umount /mnt/tools
+umount: /mnt/tools: device is busy
+umount: /mnt/tools: device is busy
+[root@localhost tools]# umount -l /mnt/tools
+	->卸载挂载点失败，因为当前目录占用挂载点目录，卸载失败，使用参数-l强制卸载成功
+======================================================
+
+[root@localhost ~]# lsb_release -a
+LSB Version:    :core-3.1-ia32:core-3.1-noarch:graphics-3.1-ia32:graphics-3.1-noarch
+Distributor ID: RedHatEnterpriseServer
+Description:    Red Hat Enterprise Linux Server release 5.5 (Tikanga)
+Release:        5.5
+Codename:       Tikanga
+[root@localhost ~]# uname -r
+2.6.18-194.el5
+
+[root@localhost ~]# uname -m
+i686
+i686	->表示32位操作系统
+x86_64	->表示64位操作系统
+
+[root@localhost ~]# cat /proc/meminfo
+	->查看内存空间使用情况
+======================================================
+
+下载主机课件到本地目录：
+ping通和主机通讯的网络，查看共享课件目录，挂载目录
+[root@localhost mnt]# cp /mnt/* /home/xiami/test -rf
+	->下载老师主机上/mnt目录下的全部课件文件到本地目录，参数-rf表示文件夹中的全部文件
+卸载挂载点
+======================================================
+
+[root@localhost ~]# echo $LANG
+en_US.UTF-8
+	->查看当前系统使用的语言字体格式
+======================================================
+nautilus /home	以文件浏览器的方式查看该目录的内容 
+	或者  应用程序  ---> 系统工具 ---> 文件浏览器
+======================================================
+
+	mkdir                   创建一个目录,并且该目录以前不存在
+
+	mkdir test              在当前目录下创建test目录
+	mkdir /tmp/test         在根目录下tmp目录里创建test目录
+	mkdir file{1..100}      在当前目录下创建file1到file100的目录,这里会创建100个目录
+	mkdir "file{1..100}"    在当前目录下创建file{1..100}目录,这里只创建一个目录
+	mkdir -p a/b/c          在当前目录下创建a/b/c目录树
+
+
+	rmdir                   只能删除空目录
+
+	rmdir test              删除当前目录的test目录，test必须是空目录
+	rmdir /tmp/test         删除/tmp下的test目录
+	rmdir file{1..100}      删除file1到file100的目录
+	rmdir "file{1..100}"    删除file{1..100}目录
+======================================================
+cp                          复制文件
+
+	        cp file dirs/           把file文件复制到dirs目录下
+	        cp -r dir1/ dir2/       把dir1目录复制到dir2目录下
+	        cp -a file dirs/        把file文件复制到dirs目录下，保留文件的原来属性
+	        cp  -rf dir1/ dir2/     强制复制文件夹，不提示
+	        cp -rvf dir1/ dir2/     把dir1目录复制到dir2目录下，并且显示复制过程
+======================================================
+
+

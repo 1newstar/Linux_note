@@ -1,0 +1,704 @@
+
+
+============================================
+
+防火墙查看及设置：
+
+[root@stu59 test]# chkconfig --list iptables
+iptables        0:off   1:off   2:on    3:on    4:on    5:on    6:off
+	->查看防火墙状态
+[root@stu59 test]# chkconfig --level 0123456 iptables off
+[root@stu59 test]# chkconfig --list iptables
+iptables        0:off   1:off   2:off   3:off   4:off   5:off   6:off
+	->关闭防火墙
+[root@stu59 test]# chkconfig --level 0123456 iptables on
+[root@stu59 test]# chkconfig --list iptables
+iptables        0:on    1:on    2:on    3:on    4:on    5:on    6:on
+	->开启防火墙
+============================================
+
+桌面环境：
+	打开终端：
+		1 在桌面点击右键 -> 打开终端
+			打开终端默认工作目录是当前用户家目录/home
+		2 alt + F2 打开运行输入 gnome-terminal 
+		3 应用程序 -> 附件 -> 终端
+
+	在一个终端打开多个标签
+		ctrl + shift + T : 快速打开一个标签，连续操作可打开多个
+		标签之间切换： alt + num
+		ctrl + shift + N : 快速创建新的 terminal 终端窗口
+	
+	关闭终端：exit
+
+	放大字体：ctrl + shift + =
+	缩小字体：ctrl + -
+	窗口最大化: alt + F10
+	窗口最小化：alt + F9
+
+	进入字符界面：
+	ctrl + alt + F1 ~ F6
+	图形界面：
+	ctrl + alt + F7
+
+	清屏：	ctrl + l
+		clear
+
+	关机：init 0 | shutdown -h now
+	重启：init 6 | reboot | shutdown -r now
+	
+	shutdown -h +30	& 表示半小时候关机
+	& 表示进程放在后台运行
+	ps -ef : 查看所有后台进程
+	kill -9 pid : 表示杀死进程号为pid的进程
+
+	shutdown -h 18:00 表示指定某一个时间点关机
+===============================================
+
+目录详解：
+	/	: 根目录
+		所有的文件都是从根开始的
+	/bin : 存放二进制可执行基本命令
+	/etc : 存放配置文件信息
+		/etc/passwd ：用户帐号文件信息
+	/media : 挂载目录 挂载光盘 优盘 硬盘
+	/root  : 表示根用户家目录
+		root 管理员用户
+		/root/Desktop/ 表示桌面
+	/home  : 普通用户家目录
+	/tftpboot : 表示tftp服务文件目录
+	/boot	: 存放镜像文件
+	/lib	: 存放库文件目录
+		动态库：.so
+		静态库：.a
+	/sbin	: 存放管理使用命令
+	/sys
+	/proc	: 虚拟目录
+		cat /proc/cpuinfo 查看CPU信息
+		cat /proc/meminfo 查看内存信息
+		cat /proc/version 查看系统版本信息
+
+	/tmp	: 临时文件目录
+	/dev	: 存放设备目录
+		c			sys
+		标准输入：键盘 鼠标	stdin		0
+		标准输出：显示器 打印机	stdout		1
+		错误输出：显示器 打印机	stderr		2
+	/mnt	: 系统默认挂载目录
+	/usr	: 用户安装文件目录
+===============================================
+
+Linux基本命令：
+	命令分类：
+		内部命令：就是shell自带的一些命令，同时这些命令是没有路径
+		外部命令：就是用户自己安装一些命令，命令就会有路径(/bin, /sbin, /usr/bin, /usr/sbin 等)
+
+		外部命令可以卸载，内部命令不能卸载
+
+		如何区分是内部命令还是外部命令：
+		type + cmd
+
+		查看外部命令路径
+		which + cmd:
+
+[root@stu59 test]# type ls
+ls is aliased to `ls --color=tty'
+	->查询命令是内部命令还是外部命令
+[root@stu59 test]# ls --color=tty
+1st  2nd  a
+[root@stu59 test]# ls
+1st  2nd  a
+
+[root@stu59 test]# /bin/ls /
+bin   home        misc  proc     srv       usr
+boot  lib         mnt   root     sys       var
+dev   lost+found  net   sbin     tftpboot  zhangsan
+etc   media       opt   selinux  tmp
+[root@stu59 test]# /bin/ls 
+1st  2nd  a
+[root@stu59 test]# /bin/ls
+1st  2nd  a
+[root@stu59 test]# which ls
+alias ls='ls --color=tty'
+        /bin/ls		->显示ls是一个外部命令
+	->查看外部命令路径
+
+[root@stu59 test]# type fdisk
+fdisk is hashed (/sbin/fdisk)		->表示fdisk是一个外部命令
+[root@stu59 test]# type cd
+cd is a shell builtin		->表示cd是一个内部命令
+[root@stu59 test]# which cd
+/usr/bin/which: no cd in (/usr/lib/qt-3.3/bin:/usr/kerberos/sbin:/usr/kerberos/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/X11R6/bin:/root/bin)
+
+[root@stu59 tmp]# echo hello
+hello
+[root@stu59 tmp]# type echo
+echo is a shell builtin
+	->echo既是内部命令，也是外部命令，加上路径后是使用外部命令
+[root@stu59 tmp]# which echo
+/bin/echo
+[root@stu59 tmp]# /bin/echo hello
+hello
+
+echo : 输出语句，默认输出显示器
+======================================================
+
+tab键使用：
+	1 对命令自动补齐
+	2 对文件自动补齐
+		/etc/sysconfig/network-scripts/ifcfg-eth0 网卡配置文件
+			
+	ctrl + c : 表示终止命令执行
+======================================
+
+man 命令
+	格式：
+		man + cmd
+
+		man 9本手册：
+		1 Commands	：	表示基本命令
+		2 System calls	：	表示系统调用函数
+		3 Library calls	：	表示C库函数 数学库 第三库
+		4 Special files ： 	表示特殊文件说明文档 块设备 字符设备
+		5 File formats and conventions	：表示文件格式及配置信息文件说明文档
+		6 Games			：	表示游戏相关说明文档
+		7 Conventions and miscellaneous	：表示网络相关说明文档
+		8 System management commands	：表示系统管理员使用命令
+		9 Kernel routines		： 表示内核相关说明文档
+
+	退出man命令：q
+
+[root@stu59 tmp]# man printf
+[root@stu59 tmp]# man 3 printf
+	->显示printf的第三本手册，表示C库函数 数学库 第三库
+
+
+help:
+	外部命令：cmd --help
+	内部命令：help cmd
+
+info:
+	info cmd
+
+	要退出帮助，可以按"q"
+
+百度 谷歌 网上查询
+=========================================
+
+ls :
+显示当前目录下包含信息（文件或者目录）
+	格式：cmd [option] ... [filename] ...
+	option:
+		-a: 表示显示所有文件信息(包括隐藏文件和"." "..")
+			.filename 	: 隐藏文件
+			.		: 表示当前工作目录
+			..		: 表示上级目录
+		-A: 表示显示隐藏文件和普通文件(.和..不显示)
+		-i: 文件的inode节点来识别文件(计算机) 或者叫文件索引号
+		-l: 表示长格式显示文件详细信息
+
+[root@stu59 /]# cd /home/xiami/test
+[root@stu59 test]# ls
+1st  2nd  a  download
+[root@stu59 test]# ls -a
+.  ..  1st  2nd  a  download
+[root@stu59 test]# touch .txt
+[root@stu59 test]# ls
+1st  2nd  a  download
+[root@stu59 test]# ls -a
+.  ..  1st  2nd  a  download  .txt
+[root@stu59 test]# ll -l -a
+total 52
+drwxr-xr-x 3 root root 4096 Apr  7 23:03 .
+drwxrwxrwx 9 root root 4096 Apr  7 01:44 ..
+-rw-r--r-- 1 root root 3637 Apr  7 22:10 1st
+-rw-r--r-- 1 root root 2785 Apr  7 22:10 2nd
+drwxr-xr-x 3 root root 4096 Apr  7 04:05 a
+-rw-r--r-- 1 root root   13 Apr  7 22:52 download
+-rw-r--r-- 1 root root    0 Apr  7 23:03 .txt
+
+		第一列：表示文件类型和权限
+			第一列第一个字符表示文件类型
+				-	: 表示普通文件
+				d	: 表示目录文件
+				c	: 表示字符设备类文件
+				l	: 表示链接文件
+				b	: 表示块设备类文件
+				p	: 表示管道文件
+					mkfifo filename
+					echo hello > ken    写端
+					cat ken		    读端
+				s	: 表示套接子文件 网络通讯 socket
+			第一列的第二个字符到第十个字符表示文件权限
+				r	: 表示只读
+				w	: 表示只写
+				x	: 表示可执行
+				-	: 表示无权限
+				三位为一组：
+				第一组：表示属主对文件权限
+				第二组：表示属组对文件权限
+				第三组：表示其他用户对文件权限
+
+		第二列：表示文件硬链接数
+			硬链接：
+				创建硬链接：ln src_file dest_file
+				1 相当给文件做一个备份，如果修改任意一个文件，硬链接的所有文件都会改变，同时删除任意一个硬链接不会影响到其他文件。
+				2 文件inode节点是一样的
+				3 不能对目录操作
+				4 硬链接不可以跨分区
+			软链接：
+				创建软链接：ln -s src dest
+				1 相当创建一个快捷方式 删除源文件，则软链接文件不可以访问
+				2 文件inode节点不一样。
+				3 可以对目录操作
+				4 可以创建成功，但是无法访问
+
+		第三列：表示文件拥有者 属主
+			
+		第四列：表示文件拥有组 属组
+
+		第五列：表示文件大小 字节
+			-h : 表示易读的方式显示文件大小
+		第六列：表示文件时间(修改文件内容)
+			atime:访问时间
+			mtime:修改文件内容时间 同时触发atime 和 ctime
+			ctime:修改文件属性(权限 属主 属组)
+
+			stat : 查看文件属性
+
+		第七列：表示文件名
+	ll => ls -l
+
+[root@stu59 test]# touch 1.c
+[root@stu59 test]# ls
+1.c  1st  2nd  a  download
+[root@stu59 test]# touch /tmp/1.c
+[root@stu59 test]# ls -i 1.c /tmp/1.c
+18350088 1.c  38928437 /tmp/1.c
+
+硬链接：ln src_file dest_file
+1 可以创建多个硬链接，文件不分主次，修改其中一个文件，硬链接的所有文件都会改变，删除任意一个文件的硬链接，其余文件不受影响
+2 硬链接文件的inode节点是一样的
+3 只能指向文件，不能对目录进行硬链接操作
+4 硬链接不可以跨分区
+5 硬链接可以在同一个分区内跨目录创建
+
+[root@stu59 test]# ls
+1st  2.c  2nd  a  download  test
+[root@stu59 test]# ln 2.c /tmp/1.c
+[root@stu59 test]# ls
+1st  2.c  2nd  a  download  test
+[root@stu59 test]# cat /tmp/1.c
+world
+[root@stu59 test]# echo hello > 2.c
+[root@stu59 test]# cat /tmp/1.c
+hello
+
+软链接：ln -s src_file dest_file
+1 相当创建一个快捷方式，删除源文件，则软链接文件不可以访问
+2 文件inode节点不一样
+3 可以对目录进行软链接
+4 跨分区创建软链接，可以创建成功但是无法访问
+
+[root@stu59 test]# ln -s 2.c 5.c
+[root@stu59 test]# ls
+1st  2.c  2nd  5.c  a  download  test
+[root@stu59 test]# ll
+total 52
+-rw-r--r-- 1 root root 3637 Apr  7 22:10 1st
+-rw-r--r-- 2 root root    6 Apr  7 23:44 2.c
+-rw-r--r-- 1 root root 2785 Apr  7 22:10 2nd
+lrwxrwxrwx 1 root root    3 Apr  7 23:47 5.c -> 2.c
+drwxr-xr-x 3 root root 4096 Apr  7 04:05 a
+-rw-r--r-- 1 root root   13 Apr  7 22:52 download
+-rw-r--r-- 1 root root    6 Apr  7 23:22 test
+
+[root@stu59 test]# echo hahaha > 2.c
+[root@stu59 test]# cat 2.c
+hahaha
+[root@stu59 test]# cat 5.c
+hahaha
+[root@stu59 test]# echo lelle > 5.c
+[root@stu59 test]# cat 5.c
+lelle
+[root@stu59 test]# cat 2.c
+lelle
+[root@stu59 test]# rm 2.c -f
+[root@stu59 test]# ls
+1st  2nd  5.c  a  download  test
+[root@stu59 test]# cat 5.c
+cat: 5.c: No such file or directory
+[root@stu59 test]# 
+
+[root@stu59 test]# ll
+total 52
+-rw-r--r-- 1 root root    6 Apr  7 23:52 1.c
+-rw-r--r-- 1 root root 3637 Apr  7 22:10 1st
+-rw-r--r-- 1 root root 2785 Apr  7 22:10 2nd
+lrwxrwxrwx 1 root root    3 Apr  7 23:47 5.c -> 2.c
+drwxr-xr-x 3 root root 4096 Apr  7 04:05 a
+-rw-r--r-- 1 root root   13 Apr  7 22:52 download
+-rw-r--r-- 1 root root    6 Apr  7 23:22 test
+[root@stu59 test]# ll -h
+total 52K
+-rw-r--r-- 1 root root    6 Apr  7 23:52 1.c
+-rw-r--r-- 1 root root 3.6K Apr  7 22:10 1st
+-rw-r--r-- 1 root root 2.8K Apr  7 22:10 2nd
+lrwxrwxrwx 1 root root    3 Apr  7 23:47 5.c -> 2.c
+drwxr-xr-x 3 root root 4.0K Apr  7 04:05 a
+-rw-r--r-- 1 root root   13 Apr  7 22:52 download
+-rw-r--r-- 1 root root    6 Apr  7 23:22 test
+====================================================
+
+cd: 切换当前目录到目的工作目录
+	cd dir_name
+
+	绝对路径：从根目录开始的路径
+	相对路径：从当前工作目录开始的路径
+
+	.	: 表示当前用户工作目录
+	..	: 表示上级目录
+	pwd : 当前的工作目录
+	[root@localhost network-scripts]# cd ..
+	root : 表示当前登录用户名	
+	localhost ： 表示主机名
+	network-scripts ： 表示当前用户工作目录
+	# : 表示提示信息 表示管理员 root
+	$ : 表示普通用户
+
+	~	: 表示当前用户家目录
+		管理家目录：	/root
+		普通用户家目录：/home/username
+
+	-	: 表示上次所处工作目录
+	[root@localhost network-scripts]# cd 直接回到当前用户家目录下
+
+[root@stu59 ~]# cd /etc/sysconfig/
+[root@stu59 sysconfig]# pwd
+/etc/sysconfig
+[root@stu59 sysconfig]# cd /
+[root@stu59 /]# pwd
+/
+[root@stu59 /]# cd -
+/etc/sysconfig
+[root@stu59 sysconfig]# pwd
+/etc/sysconfig
+[root@stu59 sysconfig]# cd ..
+[root@stu59 etc]# pwd
+/etc
+
+[root@stu59 test]# cd
+[root@stu59 ~]# pwd
+/root
+[root@stu59 ~]# su - tim
+[tim@stu59 ~]$ pwd
+/home/tim
+=========================================
+
+touch : 创建文件
+
+	[root@localhost test]# touch a.txt 创建一个文件 空文件
+	[root@localhost test]# touch a{1,2}b{1,2,3} 创建6个文件
+	[root@localhost test]# touch a{1,2} b{1,2,3} 创建5个文件
+	[root@localhost test]# touch "a{1,2} b{1,2,3}" 创建1个文件
+	[root@localhost test]# touch $USER 创建root文件
+	[root@localhost test]# touch "$USER" 创建root文件
+	[root@localhost test]# touch '$USER' 创建$USER文件
+	[root@localhost test]# touch `echo hello` 创建hello文件
+	[root@localhost test]# touch .b.txt 创建一个隐藏文件
+	[root@localhost test]# touch ./-a.txt	创建特殊文件
+
+[root@stu59 test]# touch a{1,2}b{1,2,3}
+[root@stu59 test]# ll
+total 24
+-rw-r--r-- 1 root root 0 Apr  8 00:40 a1b1
+-rw-r--r-- 1 root root 0 Apr  8 00:40 a1b2
+-rw-r--r-- 1 root root 0 Apr  8 00:40 a1b3
+-rw-r--r-- 1 root root 0 Apr  8 00:40 a2b1
+-rw-r--r-- 1 root root 0 Apr  8 00:40 a2b2
+-rw-r--r-- 1 root root 0 Apr  8 00:40 a2b3
+[root@stu59 test]# rm a{1,2}b{1,2,3} -rf
+[root@stu59 test]# ll
+total 0
+[root@stu59 test]# touch a{1,2} b{1,2,3}
+[root@stu59 test]# ll
+total 20
+-rw-r--r-- 1 root root 0 Apr  8 00:41 a1
+-rw-r--r-- 1 root root 0 Apr  8 00:41 a2
+-rw-r--r-- 1 root root 0 Apr  8 00:41 b1
+-rw-r--r-- 1 root root 0 Apr  8 00:41 b2
+-rw-r--r-- 1 root root 0 Apr  8 00:41 b3
+[root@stu59 test]# rm a{1,2} b{1,2,3} -rf
+[root@stu59 test]# ll
+total 0
+
+[root@stu59 test]# touch "a{1,2} b{1,2,3}"
+[root@stu59 test]# ll
+total 4
+-rw-r--r-- 1 root root 0 Apr  8 00:42 a{1,2} b{1,2,3}
+
+[root@stu59 test]# echo $USER
+root
+[root@stu59 test]# ll
+total 4
+-rw-r--r-- 1 root root 0 Apr  8 00:42 a{1,2} b{1,2,3}
+[root@stu59 test]# rm "a{1,2} b{1,2,3}" -rf
+[root@stu59 test]# ll
+total 0
+[root@stu59 test]# touch $USER
+[root@stu59 test]# ll
+total 4
+-rw-r--r-- 1 root root 0 Apr  8 00:43 root
+
+[root@stu59 test]# touch "$USER"
+[root@stu59 test]# ll
+total 4
+-rw-r--r-- 1 root root 0 Apr  8 00:44 root
+[root@stu59 test]# rm * -rf
+[root@stu59 test]# ll
+total 0
+[root@stu59 test]# touch '$USER'
+[root@stu59 test]# ll
+total 4
+-rw-r--r-- 1 root root 0 Apr  8 00:45 $USER
+
+[root@stu59 test]# touch echo hello
+[root@stu59 test]# ls
+echo  hello
+[root@stu59 test]# rm * -rf
+[root@stu59 test]# ls
+[root@stu59 test]# touch 'echo hello'
+[root@stu59 test]# ls
+echo hello
+[root@stu59 test]# rm * -rf
+[root@stu59 test]# touch `echo hello`
+[root@stu59 test]# ls
+hello
+
+[root@stu59 test]# date
+Fri Apr  8 00:49:39 CST 2016
+[root@stu59 test]# ls
+[root@stu59 test]# touch date
+[root@stu59 test]# ls
+date
+[root@stu59 test]# rm * -rf
+[root@stu59 test]# touch `date`
+[root@stu59 test]# ls
+00:50:16  2016  8  Apr  CST  Fri
+
+rm : 删除文件
+	格式：cmd + option + filename | dirname
+
+	option :
+		-f : 表示强制删除
+		-r : 表示删除一个目录
+	
+	案例：
+		[root@localhost test]# rm -f ./-a.txt 删除特殊文件
+
+	通配符：
+		* : 匹配任意多个字符
+		? : 匹配任意一个字符
+
+	注意：	rm / -rf !!!!!!!!
+		rm * -rf !!!!!!
+
+[root@stu59 test]# rm * -rf
+[root@stu59 test]# ls
+[root@stu59 test]# touch a b c
+[root@stu59 test]# ls
+a  b  c
+[root@stu59 test]# rm a
+rm: remove regular empty file `a'? y
+[root@stu59 test]# ls
+b  c
+[root@stu59 test]# rm -f b
+[root@stu59 test]# ls
+c
+[root@stu59 test]# rm c -f
+[root@stu59 test]# ls
+
+[root@stu59 test]# mkdir aa bb
+[root@stu59 test]# ls
+aa  bb
+[root@stu59 test]# rm aa
+rm: cannot remove directory `aa': Is a directory
+[root@stu59 test]# rm aa -r
+rm: remove directory `aa'? y
+[root@stu59 test]# ls
+bb
+[root@stu59 test]# rm -rf bb
+[root@stu59 test]# ls
+
+[root@stu59 test]# touch ./-a.txt
+[root@stu59 test]# ls
+-a.txt
+[root@stu59 test]# rm -f -a.txt
+rm: invalid option -- a
+Try `rm ./-a.txt' to remove the file `-a.txt'.
+Try `rm --help' for more information.
+[root@stu59 test]# rm -f ./-a.txt
+[root@stu59 test]# ls
+
+[root@stu59 test]# touch .a.b
+[root@stu59 test]# ls
+[root@stu59 test]# ls -a
+.  ..  .a.b  .txt
+[root@stu59 test]# rm -f ./.a.b
+[root@stu59 test]# ls
+[root@stu59 test]# ls -a
+.  ..  .txt
+[root@stu59 test]# rm ./.txt
+rm: remove regular empty file `./.txt'? y
+[root@stu59 test]# ls
+
+* :匹配任意多个字符
+? :匹配任意一个字符
+
+[root@stu59 test]# touch aa bb cc aaa bbb ccc abc
+[root@stu59 test]# ls
+aa  aaa  abc  bb  bbb  cc  ccc
+[root@stu59 test]# touch a.c b.c
+[root@stu59 test]# ls
+aa  aaa  abc  a.c  bb  bbb  b.c  cc  ccc
+[root@stu59 test]# rm ?? -rf
+[root@stu59 test]# ls
+aaa  abc  a.c  bbb  b.c  ccc
+[root@stu59 test]# rm a?c -rf
+[root@stu59 test]# ls
+aaa  bbb  b.c  ccc
+[root@stu59 test]# rm *.c -rf
+[root@stu59 test]# ls
+aaa  bbb  ccc
+[root@stu59 test]# rm ???
+rm: remove regular empty file `aaa'? y
+rm: remove regular empty file `bbb'?   
+rm: remove regular empty file `ccc'? 
+[root@stu59 test]# rm ??? -rf
+======================================
+
+mkdir : 创建一个目录
+	[root@localhost test]# mkdir -p bb/cc/dd/ff/ee 创建多极目录，如果上级目录不存在，则会自动创建
+
+rmdir: 删除一个目录
+	删除非空目录
+
+[root@stu59 test]# mkdir aa
+[root@stu59 test]# ls
+aa
+[root@stu59 test]# mkdir bb/cc/dd/ee
+mkdir: cannot create directory `bb/cc/dd/ee': No such file or directory
+[root@stu59 test]# mkdir bb/cc/dd/ee -p
+[root@stu59 test]# ls
+aa  bb
+[root@stu59 test]# cd bb
+[root@stu59 bb]# ls
+cc
+[root@stu59 bb]# cd cc
+[root@stu59 cc]# ls
+dd
+[root@stu59 cc]# cd ..
+[root@stu59 bb]# cd ..
+[root@stu59 test]# ls
+aa  bb
+[root@stu59 test]# rmdir aa
+[root@stu59 test]# ls
+bb
+[root@stu59 test]# rmdir bb
+rmdir: bb: Directory not empty
+[root@stu59 test]# rmdir bb -r
+rmdir: invalid option -- r
+Try `rmdir --help' for more information.
+[root@stu59 test]# rm ./* -rf
+[root@stu59 test]# ls
+==========================================
+
+练习：
+[root@stu59 test]# mkdir aa
+[root@stu59 test]# mkdir bb cc dd/ee/ff
+mkdir: cannot create directory `dd/ee/ff': No such file or directory
+[root@stu59 test]# ls
+aa  bb  cc
+[root@stu59 test]# rm ./* -rf
+[root@stu59 test]# ls
+[root@stu59 test]# mkdir bb cc dd/ee/ff -p
+[root@stu59 test]# ls
+bb  cc  dd
+[root@stu59 test]# cd dd
+[root@stu59 dd]# ls
+ee
+[root@stu59 dd]# cd ee
+[root@stu59 ee]# ls
+ff
+[root@stu59 ee]# cd ..
+[root@stu59 dd]# cd ..
+[root@stu59 test]# ls
+bb  cc  dd
+[root@stu59 test]# rmdir bb
+[root@stu59 test]# mkdir aa bb
+[root@stu59 test]# ls
+aa  bb  cc  dd
+[root@stu59 test]# rmdir aa bb cc
+[root@stu59 test]# ls
+dd
+[root@stu59 test]# mkdir aa bb cc
+[root@stu59 test]# ls
+aa  bb  cc  dd
+[root@stu59 test]# rmdir aa bb cc dd 
+rmdir: dd: Directory not empty
+[root@stu59 test]# ls
+dd
+[root@stu59 test]# rm * -rf
+[root@stu59 test]# ls
+[root@stu59 test]# mkdir .aa
+[root@stu59 test]# ls -a
+.  ..  .aa
+[root@stu59 test]# rmdir .aa
+[root@stu59 test]# ls
+[root@stu59 test]# ls -a
+.  ..
+[root@stu59 test]# mkdir .aa
+[root@stu59 test]# rmdir .aa
+[root@stu59 test]# mkdir .aa/bb/cc
+mkdir: cannot create directory `.aa/bb/cc': No such file or directory
+[root@stu59 test]# mkdir .aa/bb/cc -p
+[root@stu59 test]# ls -a
+.  ..  .aa
+[root@stu59 test]# cd .aa
+[root@stu59 .aa]# ls -a
+.  ..  bb
+[root@stu59 .aa]# ls
+bb
+[root@stu59 .aa]# cd ..
+[root@stu59 test]# ls
+[root@stu59 test]# ls -a
+.  ..  .aa
+[root@stu59 test]# rm .aa -rf
+[root@stu59 test]# ls -a
+.  ..
+
+============================================
+
+cp : 拷贝
+	cmd option src dest | dirname
+
+	option :
+		-r : 表示拷贝目录文件
+
+	案例：
+		cp /etc/passwd ./  表示复制文件到当前工作目录 文件名以源文件名作为目标文件名
+
+		[root@localhost test]# /bin/cp /etc/passwd aa
+		[root@localhost test]# \cp /etc/passwd aa  如果当前工作目录中如果存在目标文件，则不需要显示提示信息
+=============================================
+
+
+
+
+
+
+
+
+
+
+

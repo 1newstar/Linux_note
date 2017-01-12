@@ -1,0 +1,212 @@
+gzip:
+bzip2:
+tar: -xvf 
+shell:
+	/etc/profile ~/.bash_profile ~/.bashrc /etc/bashrc
+	~/.bash_logout
+var:
+	env:
+		export varname=value
+	set:
+echo ${varname}
+shell语言不支持小数运算
+算术运算符 + - * / % **
+字符运算：= != \> \< 
+关系运算符：-ne -eq -gt -ge -lt -le
+文件操作：
+	-e :
+	-f :
+	-d :
+	-l :
+	-c :
+	-b :
+	-r : 判断文件是否存在，且当前用户对其是否可读
+	-w :									 可写
+	-x :									 可执行
+	-O :								是其属主
+	-G :								是其属组
+
+	1 创建.sh结尾shell脚本
+	2 #!/bin/bash
+	3 chmod 755 filename.sh
+	$1 $2 ... $n
+	$#:
+	$$:
+	$?:
+	echo :
+	read :
+
+	选择结构：
+=============================================
+	逻辑运算符
+	逻辑与：&& -a
+		[[ con1 && con2 ... && conn ]]
+		[ con1 ] && [ con2 ] ... [ con3 ]
+		[ con1 -a con2 .... con3 ]
+		必须保证每一个条件都要满足，则结果为真。
+	逻辑或：|| -o
+		只需要满足一个条件，则结果为真。
+	逻辑非：!
+		
+	练习：实现判断是否是闰年
+	
+	格式四：
+		1 西红柿炒鸡蛋 -> 10$
+		2 鸡蛋炒西红柿 -> 20$
+		3 鱼香肉丝     -> 30$
+		4 小炒肉       -> 40$
+		5              -> option err
+
+	if [ con1 ]
+	then
+		cmd1
+	elif [ con2 ]
+	then
+		cmd2
+	elif [ con3 ]
+	then
+		cmd3
+	............
+	else
+		cmd_failed
+	fi
+
+
+	练习：
+		商场空调促销 1台空调价格1999
+			3台打9.5折
+			5台打9折
+			10台打8.5折
+			15台打8折
+			20台打7.5折
+
+	输入要购买台数，输出总得价格。
+
+
+	格式五：
+		case $varname in
+			con1)
+				cmd1
+				;;
+			con2)
+				cmd2
+				;;
+			.......
+			*)
+				cmd_failed
+				;;
+		esac
+
+	练习：
+		1 -> cpu info
+		2 -> mem info
+		3 -> disk info
+		4 -> err
+=============================================
+	循环语句：
+	for:
+		格式一
+		for varname in vaule1 value2 .... valuen
+		do
+			cmd
+		done
+
+		格式二
+		
+		for varname in $(seq var_stat step var_end)
+		do
+			cmd
+		done
+		练习：1 + 2 + 3 + .... + 100 = ?
+		格式三 C式for循环
+		for ((i=1; i <= 100; i++))
+		do
+			cmd
+		done
+
+		for (初始化部分1；条件部分2；增量部分3)
+		do
+			循环体4
+		done
+
+		1 -> 2 -> 4 -> 3 -> 2 -> 4 -> 3 ......
+		如果条件不满足，则退出循环
+		
+		格式四 嵌套
+		for (())
+		do
+			for (())
+			do
+				cmd
+				........
+			done
+			........
+		done
+		练习：打印99乘法表
+
+
+	while:
+	格式：
+		while [ con ]
+		do
+			cmd
+		done
+
+		while [ con ]
+		do
+			while [ con2 ]
+			do
+				cmd
+				......
+			done
+			.......
+		done
+	如果con满足，则执行cmd
+
+	练习：	1 + 3 + 5 + ... + 99 = ?
+			99
+			打印空三角形
+			*
+			* *
+			*   *
+			*     *
+			*       *
+			* * * * * *
+	死循环
+	while true
+	do
+		cmd
+	done
+
+	跳转语句：
+		break	:跳出循环，表示跳出整个循环，当前循环起作用
+		continue:跳出循环，表示跳出本次循环，当前循环起作用
+
+	homework:
+		1 通过菜单实现四种三角形打印
+		2 创建三个用户 如果用户存在，则继续创建当前用户 同时要保证可以登录成功
+		3 死循环，检测nfs服务，保证一直处于运行状态
+
+
+	
+		
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

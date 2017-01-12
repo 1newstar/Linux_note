@@ -1,0 +1,324 @@
+vim : 
+	编辑器
+gcc :
+	编译器
+
+一个源文件(.c)生成二进制可执行文件步骤：
+	1 预处理：生成.i文件
+		gcc -E hello.c -o hello.i
+		处理伪代码和特殊字符
+		伪代码：就是#开头语句
+			头文件：
+			宏命令：
+			条件编译：
+		特殊字符：__FILE__ __func__ __LINE__ __TIME__ __DATE__
+
+		把这些代码展开，然后放在源文件中
+
+	2 编译：生成.s   生成汇编代码
+	 	gcc -S hello.i -o hello.s
+		就是检查语法错误或者词法规则。
+
+		
+	3 汇编：.o文件，生成二进制代码或者叫目标代码
+		gcc -c hello.s -o hello.o
+			%!xxd
+
+	4 连接：
+		链接库文件 .so, 形成一个可执行整体
+		ldd ./hello
+===========================
+用户管理：
+	分类：
+		
+		管理用户：root用户,就是uid为0 管理用户信息
+		其他用户：
+			服务用户：uid (1 ~ 499)
+				启动后台服务需要用户帐号， 不可以登录
+			普通用户：uid (500以后)
+				就是由管理员创建用户，供所有用户使用， 可以登录
+				创建用户的时候一定要需要创建用户密码
+				创建一个用户useradd usrename
+				创建用户的时候系统会创建一个同名组(组不存在)
+
+		区分用户是管理员还是非管理员，通过用户uid来区分
+		id + username
+
+	用户信息文件：
+		用户帐号信息文件： /etc/passwd
+		用户密码信息文件： /etc/shadow md5加密算法实现
+		用户组帐号信息文件： /etc/group
+		用户组密码信息文件：/etc/gshadown
+			gpasswd + groupname
+
+		用户帐号模版信息：
+			/etc/skel/
+
+用户帐号信息文件详解：
+	tom:x:500:500::/home/tom:/bin/bash
+	jim:x:501:501::/home/jim:/bin/bash
+	mary:x:502:502::/home/mary:/bin/bash
+	以:为分割符，分成7列：
+	第一列：用户名
+	第二列：用户密码 -> /etc/shadow
+	第三列：用户uid :计算机区别不同用户
+	第四列：用户组gid
+	第五列：描述性信息，用来解释这个用户功能
+	第六列：用户家目录
+			管理用户：/root
+			普通用户：/home
+			[root@localhost test]# echo $HOME
+			/root
+			[root@localhost test]# su - jim
+			[jim@localhost ~]$ echo $HOME
+			/home/jim
+
+	第七列：表示用户所使用shell
+		系统所支持所有shell : 
+			[root@localhost test]# ls /bin/*sh
+			/bin/bash  /bin/csh  /bin/ksh  /bin/sh  /bin/tcsh
+		查看本机目前所使用shell:
+			[root@localhost test]# echo $SHELL
+			/bin/bash
+
+用户密码信息文件详解：
+	tom:$1$rNFOmaos$DdXMySEbzMXNI24quegQB1:16902:0:99999:7:::
+	jim:!!:16898:0:99999:7:::
+	mary:!!:16902:0:99999:7:::
+	第一列：表示用户名 /etc/passwd
+	第二列：表示用户密码信息, !! 表示没有密码
+			通过md5加密算法来实现
+			[root@localhost test]# grub-md5-crypt  加密算法
+			Password: 					明文
+			Retype password: 
+			$1$afAAk$6oHbrHGzoGRAHETeu5xjV.	暗文
+			暗文由两部分组成：密钥和密码
+			$1$afAAk$ 密钥
+			6oHbrHGzoGRAHETeu5xjV. 密码
+	第三列：表示从1970年1月1日到上次修改密码天数
+	第四列：表示两次修改密码间隔天数
+			0 表示无间隔
+	第五列：密码有效期 99999表示永久不会失效
+	第六列：密码失效前提示信息
+	第七列：表示密码过期后还可以使用多少天
+	第八列：表示帐号有效期，主要用于收费系统开发软件
+	第九列：保留
+
+用户组帐号信息文件详解 /etc/group
+	tom:x:500:
+	jim:x:501:
+	mary:x:502:
+	root:x:0:root
+	bin:x:1:root,bin,daemon
+	第一列：用户组组名
+	第二列：用户组密码  /etc/gshadow
+	第三列：表示用户组gid
+	第四列：表示用户组成员
+用户组密码信息文件：/etc/gshadow
+	tom:$1$dI4yh/.Z$Gw2Opry.SVPPy79KrFEXX/::
+	jim:!::
+	mary:!::
+	root:::root
+	bin:::root,bin,daemon
+
+	第一列：用户组名
+	第二列：密码 md5
+	第三列：用户组管理员
+	第四列：用户组成员列表
+
+	[root@localhost test]# ls /var/spool/mail/tom 临时邮箱没有
+=======================
+	创建用户：useradd | adduser + username
+		
+	设定用户密码：
+		passwd + username
+
+	删除用户：userdel + username : 不彻底删除
+			不会删除用户家目录和邮箱没有
+			会造成再次创建失败。
+		userdel -r username 	: 表示彻底删除
+	
+	切换用户： su 
+		[root@localhost test]# su tom  不完全切换，会把上次用户环境变量继承过来
+		[tom@localhost test]$ exit
+		exit
+		[root@localhost test]# su - tom 完全切换，所有环境变量都是自己的
+		[tom@localhost ~]$ 
+
+	案例1：
+		[root@localhost test]# su tom
+		[tom@localhost test]$ echo $PATH
+		/usr/kerberos/sbin:/usr/kerberos/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/X11R6/bin:/root/bin
+	
+		[tom@localhost test]$ exit
+		exit
+		[root@localhost test]# su - tom
+		[tom@localhost ~]$ echo $PATH
+		/usr/kerberos/bin:/usr/local/bin:/bin:/usr/bin:/home/tom/bin
+
+	案例2：
+		[root@localhost test]# a=123hello 定义一个局部变量
+		[root@localhost test]# echo $a  取变量的值
+		123hello
+		[root@localhost test]# su tom   不完全切换
+		[tom@localhost test]$ echo $a  取值并没有取出，是因为a是局部变量
+
+		[tom@localhost test]$ exit
+		exit
+		[root@localhost test]# export a=123hello 定义环境变量
+		[root@localhost test]# echo $a
+		123hello
+		[root@localhost test]# su tom 不完全切换
+		[tom@localhost test]$ echo $a 则可以取出环境变量值
+		123hello
+		[tom@localhost test]$ exit
+		exit
+		[root@localhost test]# su - tom  完全切换
+		[tom@localhost ~]$ echo $a  则不可以取出环境变量值
+
+		要返回上次用户登录状态，则直接用exit退出当前用户，不可以再次切换
+		pstree | grep bash
+
+		高级用户向低级用户切换，不需要密码验证。
+		如果低级用户要高级用户切换，则需要输入切换用户密码验证。
+		如果平级用户之间切换，则需要密码验证，输入切换用户密码。
+
+	修改用户信息：
+		usermod [option] uername
+		option:
+			-c	: 表示添加描述性信息
+			[root@localhost test]# usermod -c "hellohelooo" join
+			-e	: 表示有效期
+			usermod -e 10/10/2016 join
+			-s : 指定用户使用的shell
+			usermod -s /bin/tcsh join
+===============================================
+用户权限：
+	基本权限：
+	只读：r		4
+	只写: w		2
+	可执行：x	1
+	无权限：	0
+
+	rwx => 7
+	rw- => 6
+	r-x => 5
+	r-- => 4
+	-wx => 3
+	-w- => 2
+	--x => 1
+	--- => 0
+
+	属主：		u
+	属组：		g
+	其他用户：	o
+	所有用户：	a
+
+	指定权限 ： chmod mode filename | dirname
+	
+	案例：
+		[root@localhost test]# chmod u+x a.txt	表示属主添加可执行权限。
+		[root@localhost test]# chmod u+x,g+x,o+x b.txt  表示属主，属组 其他用户添加可执行权限
+		[root@localhost test]# chmod a+x c.txt 同上
+
+		[root@localhost test]# chmod u-w a.txt 去掉属主只写权限
+		[root@localhost test]# chmod g=r a.txt 不考虑原来文件权限
+		[root@localhost test]# chmod 00777 a.txt
+			表示设定属主，属组 其他用户权限为777
+			第一个0 : 表示八进制
+			第二个0 : 表示高级权限
+		-R: 表示同时可以指定下级目录中的所有文件己目录权限
+
+	指定用户属主和属组：
+		chown u:g filename | dirname
+
+		[root@localhost test]# chown tom a.txt 修改文件属主为tom
+		[root@localhost test]# chown :jim a.txt 修改文件属组为jim
+		[root@localhost test]# chown zhangsan: a.tx 修改属主，属组都为zhangsan
+		[root@localhost test]# chown lisi:jim a.txt 同时修改属组和属主为不同的用户和用户组。
+
+		创建一个组：
+			groupadd + groupname
+			groupadd admin 表示创建一个admin组
+
+		删除组：
+			[root@localhost test]# groupdel admin 删除一个组
+		
+		指定组放入用户：
+			gpasswd  [option]  username groupname
+			option:
+				添加格式：gpasswd -a user group
+				-a : 表示将一个用户添加到一个组中
+				[root@localhost test]# gpasswd -a jim admin
+				删除格式：gpasswd -d user group
+				案例：
+					[root@localhost test]# gpasswd -d tom admin  执行命令
+					正在将用户“tom”从“admin”组中删除			显示过程
+					[root@localhost test]# tail -n 2 /etc/group 查看是否删除成功。
+					join:x:603:
+					admin:x:604:jim,join
+				指定管理员格式：gpasswd -A user group
+				案例：
+					[root@localhost test]# tail -n 2 /etc/gshadow 查看 
+					join:!::
+					admin:!::jim,join
+					[root@localhost test]# gpasswd -A jim admin 添加
+					[root@localhost test]# tail -n 2 /etc/gshadow 查看是否成功
+					join:!::
+					admin:!:jim:jim,join
+
+		修改组信息：
+			groupmod option newgroupname oldgroupname
+			option:
+				-g : 表示修改组gid
+					[root@localhost test]# groupmod -g 888 guest
+				-n : 表示修改组名
+					[root@localhost test]# groupmod -n guest admin
+				
+		用户组设置密码：
+			gpasswd + groupname
+	
+	练习：
+		创建共享目录，tom用户对其可读，可写，可执行。jim，mary,join对其可读可执行。其他用户只能对其可读。
+		1 创建共享目录
+			mkdir /test/share
+		2 首先创建tom用户，然后将tom为其共享目录属主
+			useradd tom
+			chown tom share
+		3 创建一个用户组
+			groupadd test
+		4 创建三个用户
+			useradd jim
+			useradd mary
+			useradd join
+		5 将三个用户添加到test组中
+			gpasswd -a jim test
+			gpasswd -a mary test
+			gpasswd -a join test
+		6 设定共享目录属组为test
+			[root@localhost test]# chown :test share
+		7 指定共享目录权限
+			chmod 0754 share
+
+		
+		r:
+			对文件：则可以进行cat head tail less more这些命令，不可以修改
+				如果上级目录有w权限，则这个文件就可以强制修改。
+			对目录：
+		w:
+		x:
+
+
+
+	homework:
+		手动创建一个用户，并验证可以登录成功
+
+
+
+
+
+
+
+
+
+

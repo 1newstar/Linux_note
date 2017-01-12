@@ -1,0 +1,76 @@
+顺序结构：
+	代码由上倒下顺序执行
+选择结构：
+	if 
+	then
+	else
+	fi
+	====
+	if
+	then
+	elif
+	then
+	.....
+	else
+	fi
+	===
+	case $varname in
+		value1)
+			;;
+		value2)
+			;;
+		......
+		*)
+		;;
+	esac
+循环结构：
+	for
+		for varname in ...
+		do
+			cmd
+		done
+
+		for varname in $(seq var_stat step var_end)
+		do
+			cmd
+		done
+		for ((;;))
+		do
+			cmd
+		done
+	while
+		while [ con ]
+		do
+			cmd
+		done
+	while true  死循环
+	do
+		cmd
+	done
+	break
+	continue
+=========================
+	函数：
+	格式：
+		function name (){
+			body
+		}
+
+		name (){
+			body
+		}
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,357 @@
+头文件存放路径：
+	/usr/include/
+基本命令：
+	man help info -> tab -> ls -> ln  -> mkfifo -> stat -> touch 
+		"":不会屏蔽特殊字符$,当时会屏蔽空格
+		'':屏蔽特殊字符和空格
+		``:首先执行反引号里面内容，然后把执行结果付给前面命令
+	-> rm -> mkdir -p -> rmdir -> cp
+======================================
+mv : 移动或者改名
+	mv src dest
+	mv src1 src2 src3 ... directory
+		如果有多个来源文件或目录，则最后一个目标文件必须是目录
+
+	option:
+		-f : 强制，如果目标文件已存在，不会询问直接覆盖
+		-i : 若目标已经存在，询问是否覆盖
+
+	[root@localhost test]# mv a.txt c.txt 改名
+	[root@localhost test]# mv b.txt /tmp/ 移动
+	[root@localhost test]# mv /tmp/b.txt ./a.txt 移动并改名
+
+	rename : 大量更改文件名，略
+
+	tree : 表示树形结构显示目录信息
+
+[root@localhost test]# basename /etc/sysconfig/network
+network		->取得路径中的文件名
+[root@localhost test]# dirname /etc/sysconfig/network
+/etc/sysconfig	->取得路径中的目录名
+
+=====================================
+cat : 查看文件内容
+	cmd + option + filename
+	option :
+		-n : 显示行号
+		-A : 显示结尾符$
+		-b : 不现实空行
+		tab键占8个字节
+
+tac  : 从最后一行开始显示，和cat相反
+
+nl + file : 显示的时候，显示行号
+
+head : 显示前面行 默认显示前10行
+	[root@localhost test]# head -n 5 /etc/passwd 指定显示行数
+
+tail : 显示后面行。默认也是10行
+	[root@localhost test]# tail -n 2 /etc/passwd
+	[root@localhost test]# cat -n /etc/passwd | head -n 5 显示行号
+
+	实例：
+		cat -n test.c | head -n 20 | tail -n 10  -> 显示第10到20行之间内容
+
+more : 分屏显示文件内容
+	查看后面一行内容 -> enter
+	向下翻页查看内容 -> space
+	返回查看上页内容 -> b
+	退出查看模式    -> q
+	显示内容中查询word  -> /word -> Enter -> n 向下逐个查看
+	显示文件名及当前行数 -> :f
+	[root@localhost test]# more -5 /etc/passwd 表示显示前5行
+	[root@localhost test]# more +5 /etc/passwd 表示从第5行开始显示
+
+less : 分屏显示
+	查看后面一行内容 -> enter
+	向下翻页查看内容 -> space	
+	上下翻页查看    -> [pageup][pagedown]
+	向下搜寻	      -> /string
+	向上搜寻	      -> ?string	
+	可以上下查看 -> 方向键控制 -> 结束q
+	less +5 /etc/passwd 表示从第五行开始显示
+====================================
+
+alias 别名
+	[root@localhost test]# alias ii='ls -l' 临时
+	修改配置文件
+		vim ~/.bashrc
+		添加一行 alias ii='ls -l'
+		source ~/.bashrc 使文件生效
+	[root@localhost test]# unalias iii 取消别名
+===================================
+
+| : 管道命令
+	mkfifo ken : 管道文件
+	管道通讯
+	所有命令连接起来，前一个命令输出作为后一个命令输入
+	注意：
+		1 管线命令仅处理standard output，对于standard error output会忽略
+		2 管线命令必须能够接受来自前一个指令的数据成为standard input继续处理才行
+	案例：
+		在/etc/passwd 查找含有root字符串行
+		[root@localhost test]# cat -n /etc/passwd | grep root 表示查找匹配关键字
+	grep 查找匹配信息
+		cmd + option + filename
+		-w : 表示显示匹配单词
+		-i : 表示不区分大小写
+		-n : 显示行号
+		-c : 计算找到匹配单词的次数
+		-v : 反向选择，显示出没有匹配字符的行
+	
+	[root@localhost test]# cat /etc/passwd | cut -d ':' -f 2,7 | sort | uniq | wc -l 表示统计有多少种shell
+	cut 	: 表示分割截取
+		-d : 后面接分隔符，与-f一起使用
+		-f : 依据-d的分隔字符将一段数据分隔成数段，用-f取出第几段
+		-c ：以字符的单位取出固定字符区间
+
+	sort 	: 表示排序
+		-f : 忽略大小写
+		-b : 忽略最前面的空格符部分
+		-r : 反向排序
+
+	uniq 	: 表示去掉重复行，只保留一行
+
+	wc		: 表示统计
+		-l : 统计行
+		-c : 统计字符
+		-w : 统计多少个单词
+		
+		实例：
+		[root@localhost test]# cat /tmp/vitest/man.config | wc
+		    151     751    4987		-> 行、字数、字符数
+
+=======================================================
+
+重定向：
+			  文件指针  文件描述符
+	标准输入：stdin		0
+	标准输出：stdout	1
+	错误输出：stderr	2
+
+	输出重定向：
+		> : 正确输出重定向 清空
+		[root@localhost test]# echo hello > a.txt 指向文件
+		2> : 错误诉出重定向
+		[root@localhost test]# ls ./lskhfdja 2> a.txt
+
+		[root@localhost test]# ls / ./khsadkja > a.txt 2> b.txt 分别把正确和错误放在不同文件中
+		[root@localhost test]# ls / ./khsadkja &> a.txt 把正确和错误放在同一个文件中
+		空洞文件 /dev/null
+
+		>> : 追加方式重定向
+		[root@localhost test]# echo hello >> a.txt    正确信息
+		[root@localhost test]# ls ./ksdha  2>> a.txt  错误信息
+
+
+
+	输入重定向：
+		< :
+		[root@localhost test]# passwd tom < a.txt
+
+		passwd : 设定用户密码
+			passwd + username
+		[root@localhost test]# cat a.txt 
+		123456
+		123456
+
+		<< ： 表示输入结束符
+		[root@localhost test]# cat << AAA
+		> kjsdf
+		> khdskja
+		> jdksa
+		> lkdsa
+		> kfd
+		> AAA
+		kjsdf
+		khdskja
+		jdksa
+		lkdsa
+		kfd
+==========================================
+vim：编辑器 程序开发器
+	vim  : 查看版本信息
+
+	三种模式：
+		一般模式：vim直接打开文件就是一般模式
+		编辑模式：在文件左下角有"插入"字样，则表示是编辑模式
+		命令行模式：在文件左下角有":"字样，则表示进入命令行模式
+	切换：
+		一般模式切换到编辑模式：
+		i I o O s S a A
+		编辑模式切换命令行模式
+		ESC键 -> 按: -> wq(表示保存退出) q!(强制退出，并不保存)
+
+	练习：实现hello功能
+
+	一般模式：
+		删除：
+			dd	: 表示删除一行
+			ndd	: 表示删除n行
+
+			dw	: 表示删除一个单词 必须光标处于第一个字符
+			ndw : 表示删除n个单词
+			daw : 表示删除一个单词 光标任意一个字符
+
+			d$	: 表示从光标位置删除到行结尾
+			d^	: 表示从光标位置删除到行开头
+
+			dgg	: 表示从光标所处的行删除到文件开头
+			dG	: 表示从光标所处的行删除到文件结尾
+
+		撤销：
+			u	: 表示撤销上次操作
+			ctrl + r : 表示反撤销
+			J	: 表示合并两行
+
+			.   : 重复前一个动作
+
+		复制：
+			yy	: 表示复制一行
+			ygg : 表示复制光标到第一行的所有数据
+			yG  : 表示复制光标到最后一行的所有数据
+			y0  : 表示复制光标所在字符到改行行首的所有数据
+			y$  : 表示复制光标所在字符到改行行尾的所有数据
+			
+			p : 粘贴，将已复制数据粘贴在光标下一行
+			P : 粘贴，将已复制数据粘贴在光标上一行
+			nyy : 表示复制n行
+
+		可视化操作：
+			可视化行：shift + v -> 方向键选中 -> y -> p
+			可视化字符：v -> y -> p
+			可视化块 ：ctrl + v -> y -> p
+	
+		移动：
+			h	: 前移
+			j	: 下移
+			k	: 上移
+			l	: 后移
+
+			ngg : 定位n行
+			gg	: 文件开头
+			G	: 文件结尾
+			$	: 定位到行结尾
+			^	: 定位到本行开头第一个有效字符
+			0   : 定位到本行第一列
+			H	: 定位到屏幕开头
+			M	: 定位到屏幕中间
+			L	: 定位到屏幕结尾
+
+		翻页：
+			Ctrl + f : 向下翻页，相当于[pagedown]
+			Ctrl + b : 向上翻页，相当于[pageup]
+			Ctrl + d : 向下翻半页
+			Ctrl + u : 向上翻半页
+			
+			n + space : 光标向右移动这行的n个字符
+
+		剪切：
+			可视化 -> d -> p
+	
+			
+
+	注意：有时打开一个文件的时候，会出现提示信息，是因为上次非法操作造成文件不完整，然后询问用户是否恢复文件内容，如果恢复成功，则删除一个同名的隐藏文件的.swp格式文件。
+
+	编辑模式：
+		i I o O a A s S
+		i:表示在光标前面插入
+		I:表示光标所在行行首插入
+		o:表示光标的下一行插入
+		O:表示光标的上一行插入
+		a:表示在光标后面插入
+		A:表示光标的行尾插入
+		s:表示删除光标字符插入
+		S:表示删除光标所在行插入
+		R:表示替换当前字符
+	命令行模式：
+		:w	表示保存文件内容
+		:q	表示退出
+		:q! 表示强制退出，不保存
+		:wq	表示保存并退出
+		:w filename 表示另存为
+		ZZ  表示若文件未改动则不保存退出，若文件改动则存储后退出
+		:r !cat /etc/passwd  获取外部信息
+		:r !sed -n "stat_line,end_linep" filename : 表示获取文件中的某些行。
+		:set nu 	表示显示行号  临时生效
+		:set nonu	表示取消行号  临时生效
+
+		永久生效：
+			在vim配置文件中修改：vim ~/.vimrc 添加一行set nu
+		:set ts=4 : 表示设置tab键为4个字节 默认8个字节
+		:set shiftwidth=4 表示设置shift键位宽
+			移位：
+				右移：shift + >
+				左移：shift + <
+		:set ai : 表示对齐方式
+		
+		对终端切割：
+			水平切割：vim -o filename1 filename2 ... filenamen
+				文件之间切换ctrl + w(2次)   或:ctrl + w + 箭头
+				全部退出：wqa
+				添加切割窗口：:split filename  或:sp filename
+
+			垂直切割：vim -O filename1 filename2 ... filenamen
+				添加切割窗口：:vsplit filename
+		:set mouse=a 表示支持鼠标
+
+	查找和替换
+	查找：
+		:/word 查找到word后会以高亮显示
+		由上到下逐个查看：n
+		由下到上逐个查看：N
+		:?word 查找到word后会以高亮显示
+		由上到下逐个查看：N
+		由下到上逐个查看：n
+	替换:
+	格式：
+		m,ns/old/new/option
+		%s/old/new/option
+		
+		m,ns : m表示起始行 n表示结束行
+		%s	 : 表示全文
+
+		option
+		g	: 表示全部替换
+		i	: 表示不区分大小写
+
+		:set ic 表示不区分大小写
+	如果替换部分出现有特殊字符，则需要转义符\
+	案例：
+		%s/\/\/http/ftp/g
+		表示将//http协议转换成ftp协议
+
+	文件加密：
+		:X
+	取消密码：
+		:set key=
+==============================================
+
+	用户管理及权限
+	磁盘管理 自动挂载 
+	网络管理  -> yum
+	服务配置 -> nfs http 
+	进程管理
+	rpm包安装
+		rpm
+		yum
+		源码包安装
+		其他方式安装
+	shell编程
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+

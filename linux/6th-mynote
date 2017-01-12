@@ -1,0 +1,110 @@
+
+
+[root@localhost tools]# mount -t iso9660 -o loop /home/xiami/tools/rhel55.iso /tmp/iso
+[root@localhost tools]# ls /tmp/iso
+	-> 挂在iso镜像文件
+
+vim /etc/fstab
+在末行添加：
+/home/xiami/tools/rhel55.iso /tmp/iso            iso9660 defaults,loop  0 0
+[root@localhost tools]# df -h
+自动挂载：
+mount -a
+卸载：
+umount /tmp/iso
+
+[root@localhost xiami]# mii-tool
+eth0: negotiated 100baseTx-FD, link ok
+[root@localhost xiami]# mii-tool
+eth0: no link
+[root@localhost xiami]# mii-tool
+eth0: negotiated 100baseTx-FD, link ok
+										
+
+[root@localhost xiami]# ifconfig
+
+
+IP地址：172.16.1.52 一共占32位，每个字最大为255
+前三个数字为网络号，最后一个数字为主机号（0：测试用，1：路由）
+亚洲用C类地址
+D类地址是广播地址
+
+局域网是私有网络，IP地址可以随意设置
+
+Bcast:默认网关	前两个数字是网络号
+Mask:子网掩码
+
+IPV6 占用128位
+
+
+DEVICE=eth0
+BOOTPROTO=none
+HWADDR=D8:5D:4C:6D:FA:16
+ONBOOT=yes
+TYPE=Ethernet
+USERCTL=no
+IPV6INIT=no
+PEERDNS=yes
+NETMASK=255.255.0.0
+IPADDR=172.16.1.101
+
+
+
+
+
+[root@localhost xiami]# vim /etc/sysconfig/network-scripts/ifcfg-eth0 
+	-> 设置IP的配置文件，内容和网络配置窗口界面的参数实时相对应
+[root@localhost xiami]# vim /etc/resolv.conf
+	-> 设置子网掩码
+[root@localhost tools]# system-config-network
+	-> 打开网络配置的窗口界面
+
+[root@localhost tools]# service network restart
+Shutting down interface eth0:                              [  OK  ]
+Shutting down loopback interface:                          [  OK  ]
+Bringing up loopback interface:                            [  OK  ]
+Bringing up interface eth0:                                [  OK  ]
+	-> 配置完参数后，需要重新启动网络服务
+
+
+yum配置：
+1 先挂载rhel55.iso镜像文件：
+	[root@localhost ~]# mount -t iso9660 -o loop /home/xiami/tools/rhel55.iso /tmp/iso
+	df -h : 查看镜像挂载情况
+2 修改yum配置文件
+	[root@localhost test]# vim /etc/yum.repos.d/rhel-debuginfo.repo 
+	注：[root@localhost test]# ls /etc/yum.repos.d/
+		rhel-debuginfo.repo		-> 路径中的配置文件只能是这一个，有别的文件存在不行
+	将文件中内容修改为一下内容（需要iso/Server,VT,Cluster,ClusterStorage四个文件）：
+		[Server]
+		name=Server
+		baseurl=file:///tmp/iso/Server
+		enabled=1
+		gpgcheck=0
+
+		[VT]
+		name=VT
+		baseurl=file:///tmp/iso/VT
+		enabled=1
+		gpgcheck=0
+
+		[Cluster]
+		name=Cluster
+		baseurl=file:///tmp/iso/Cluster
+		enabled=1
+		gpgcheck=0
+
+		[ClusterStorage]
+		name=ClusterStorage
+		baseurl=file:///tmp/iso/ClusterStorage
+		enabled=1
+		gpgcheck=0
+3 安装yum：
+	[root@localhost test]# yum chean all
+	[root@localhost test]# yum list
+
+
+4 Linux系统之间文件共享
+
+5 Linux和Windows系统之间文件共享
+http服务

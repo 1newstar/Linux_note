@@ -1,0 +1,356 @@
+用户信息文件：
+	/etc/passwd
+	/etc/shadow
+	/etc/group
+	/etc/gshadow
+	useradd -> id -> passwd -> userdel -r -> usermod -> su - username
+	groupadd -> gpasswd -> groupdel -> groupmod -> groups
+
+	groups : 查看用户属于哪个用户组
+
+	属主：u
+	属组：g
+	其他用户：o
+	所用用户：a
+	chmod  + - = num
+	chown u:g filename | dirname
+
+	创建一个用户：ken
+	1 打开用户帐号信息文件 /etc/passwd
+		添加一行：ken:x:2000:2000:test:/home/ken:/bin/bash
+	2 打开用户密码信息文件 /etc/shadow
+		添加一行：ken:$1$DriFk$u3jvp7O23GWoLJS/z6HFU/:16902:0:99999:7:::
+		设定密码：
+			[root@localhost test]# grub-md5-crypt >> /etc/shadow
+	3 打开用户组信息文件：/etc/gruop
+		添加一行：ken:x:2000:
+	4 打开用户组密码信息文件：/etc/gshadow
+		添加一行： ken:$1$q8kFk$teQDLaINxQixh4X57UD8R1:16902:0:99999:7:::$
+		注意：结尾不可以有空格或者特殊字符
+	5 创建用户家目录：
+		mkdir /home/ken
+	6 拷贝用户模版信息
+		cp /etc/skel/.* /home.ken  (排除.和..)
+		cp /etc/skel/.????* /home/ken/ -rf
+	7 设置文件的属主和属组
+		chown -R ken:ken /home/ken/
+
+	r:
+		文件：就是可以查看文件内容(cat head tail less more)
+		目录：可以查看目录连接(ls)
+	w:
+		文件：就是可以修改文件内容(vim), 如果本文件没有写权限，但是上级目录有写权限，我们可以强制修改文件内容。
+		目录：看是否可以创建文件或者目录(mkdir touch)
+	x:
+		文件：只对二进制可执行文件起作用
+		目录：就是看是否可以进入目录(cd)
+
+========================================
+	默认创建文件权限：644
+	默认创建目录权限：755
+	默认权限：umask
+		[root@localhost test]# umask
+		0022
+
+	文件权限：666 - umask = filemode
+	目录权限：777 -umask = dirmode
+
+	临时修改：
+		[root@localhost test]# umask 0002
+		[root@localhost test]# umask
+		0002
+	
+	永久修改：
+		vim ~/.bashrc 	
+		最后添加一行：umask 0222
+		source ~/.bashrc 使文件生效
+=======================================
+高级权限：
+		对属主设置特权：
+		S_ISUID   04000 set user ID on execution
+		file:
+			对二进制可执行文件起作用
+			chmod u+s file
+			chmod 04XXX file
+			案例：
+			管理员设定一个特权
+			[root@localhost test]# ll /sbin/fdisk 
+			-rwxr-xr-x 1 root root 96148 2010-01-07 /sbin/fdisk
+			[root@localhost test]# chmod u+s /sbin/fdisk 
+			[root@localhost test]# ll /sbin/fdisk 
+			-rwsr-xr-x 1 root root 96148 2010-01-07 /sbin/fdisk
+
+			普通用户就可以委托管理员来执行
+			[tom@localhost ~]$ /sbin/fdisk -l
+			Disk /dev/sda: 21.4 GB, 21474836480 bytes
+			255 heads, 63 sectors/track, 2610 cylinders
+			Units = cylinders of 16065 * 512 = 8225280 bytes
+
+			   Device Boot    Start     End      Blocks   Id  System
+			   /dev/sda1   *         1      13      104391   83  Linux
+			   /dev/sda2            14    1828    14578987+  83  Linux
+			   /dev/sda3          1829    2089     2096482+  82  Linux swap / Solaris
+
+		dir :
+			不适用
+	对属组设定特权：
+		S_ISGID   02000 set group ID on execution
+		格式：
+			chmod g+s filename | dirname
+			chmod 02XXX filename | dirname
+		file :
+			以属组身份运行
+		dir  :
+			就会继承上级目录属组，不会以当前用户组来运行这个目录。
+			同时创建目录也会有这样一个特权。
+	对其他用户设定特权：
+		S_ISVTX   01000 sticky bit
+		格式：
+			chmod o+t dirname
+			chmod 01xxx dirname
+		file : 不适用
+		dir  :
+			不同用户在操作目录时，只可以修改或者删除自己创建文件，同时可以浏览其他用户文件信息，但是不可以删除或者修改其他用户文件信息。
+==================================================
+linux磁盘管理：
+	
+	查看文件类型：file + filename
+		[root@localhost test]# file a.txt 
+		a.txt: empty			说明是一个空文件
+		[root@localhost test]# file a.txt 
+		a.txt: ASCII text		表示是一个文本文件
+		[root@localhost test]# file /bin/ls
+		/bin/ls: ELF 32-bit LSB executable, Intel 80386, version 1 (SYSV), for GNU/Linux 2.6.9, dynamically linked (uses shared libs), for GNU/Linux 2.6.9, stripped
+								表示是一个二进制可执行文件
+		[root@localhost test]# file aa.tar.bz2 
+		aa.tar.bz2: bzip2 compressed data, block size = 900k
+								表示是一个压缩文件
+		[root@localhost test]# file /
+		/: directory			表示是一个目录
+
+	which : 查看命令文件
+		格式 ： which + filename
+	locate : 查找文件 查找效率很高
+		格式 ： locate option filename
+		如果新创建文件，则需要更新数据库updatedb
+		然后才可以找的到。
+	find:
+		格式：cmd + path + [option  optionmode]
+		option:
+			-name : 表示按姓名查找
+				[root@localhost test]# find / -name passwd 表示查找passwd文件
+			-type : 表示按类型查找
+				f : 表示是一个普通文件
+				d : 表示是一个目录
+				l : 表示是一个管道文件
+				b : 表示是一个块设备文件
+				c : 表示字符设备类文件
+				p : 表示管道文件
+				s : 表示是一个套接子文件
+				案例：
+				find /test/ -type 'l'
+			-perm:	 表示按权限查找
+				[root@localhost test]# find /test -perm 0777
+				find /test -perm -o=x
+				[root@localhost test]# find /test -perm -o=x -perm -g=w
+					表示查找其他用户有执行的权限并且属组有写权限文件。
+			-uid : 表示按属主查找
+				[root@localhost test]# find /test/ -uid 500
+			-gid : 表示按属组查找
+				[root@localhost test]# find /test/ -gid 501
+			-size : 表示按大小查找
+				find /test/ -size 0	表示查找空文件
+				[root@localhost test]# find /test -size -1024c 查找小于1k大小文件
+				[root@localhost test]# find /test -size +1024c 查找大于1k大小文件
+				find /test/ -size +50c -size -100c 查找大于50小于100字节文件
+			-atime ctime mtime
+				-n : 表示查找n天以内文件
+				+n : 表示查找n天以前文件
+				find /test/ -atime -2 表示2天以内文件
+	查找到结果处理
+		-exec cmd {} \;
+			{} 	: 表示执行所有操作
+			\	: 表示转义
+			;	: 命令执行结束
+
+		-ok : 需要确认是否删除
+		案例：
+			[root@localhost test]# find / -perm 0777 -type f -ok rm {} \;
+			find /test/ -size 0 -exec rm {} \;
+
+	date : 表示查看系统时间
+		[root@localhost test]# date
+		2016年 04月 12日 星期二 15:20:48 CST
+		%Y : 年份
+		%m : 月份
+		%d : 日期
+		%H : 小时
+		%M : 分钟
+		%S : 秒
+		[root@localhost test]# date -s 3:27:00 修改时间
+	显示日历：
+		cal : 默认显示当前月份
+		cal 2016 : 表示显示2016整年日历信息
+		cal 5 2016 ：表示显示某一月日历
+	bc : 超文本计算器
+		+ - * / % ^
+		scale=2 设定小数位数
+		退出quit
+	uname : 查看系统信息：
+		格式：uanme option ...
+		option :
+			-a : 显示所有系统信息
+			-s : 表示显示内核名
+			-n : 表示主机名
+			-r : 表示查看内核版本号
+			-m : 表示系统平台
+			-o : 表示操作系统名
+	查看主机名：hostname
+		[root@localhost test]# hostname aa.bb.com 临时起名
+		永久生效：/etc/sysconfig/network 修改主机名
+			init 6 重启生效
+===================================
+
+nautilus + dirname 用指令打开文件夹，并可视化显示文件夹中内容
+
+===================================
+
+	fdisk : 管理磁盘命令
+	[root@localhost ken]# fdisk -l
+
+	Disk /dev/sda: 21.4 GB, 21474836480 bytes 设备名 空间大小
+	255 heads, 63 sectors/track, 2610 cylinders 柱面
+	Units = cylinders of 16065 * 512 = 8225280 bytes
+
+	   Device Boot      Start         End      Blocks   Id  System
+	   /dev/sda1   *           1          13      104391   83  Linux
+	   /dev/sda2              14        1828    14578987+  83  Linux
+	   /dev/sda3            1829        2089     2096482+  82  Linux swap / Solaris
+	
+	设备名：
+		sd	: SCSI接口硬盘
+		hd	: IDE接口硬盘
+			a : 表示第一张硬盘
+			b : 第二张硬盘
+				1 ： 表示第一块分区
+				2 :  表示第二块分区
+		sda1 :
+		
+		第一部：分区 fdisk /dev/sda
+		Command (m for help): m
+		Command action
+		   a   toggle a bootable flag 
+		   b   edit bsd disklabel 
+		   c   toggle the dos compatibility flag 
+		   d   delete a partition   	删除一个分区
+		   l   list known partition types 
+		   m   print this menu     		打印菜单
+		   n   add a new partition 		添加一个分区
+		   o   create a new empty DOS partition table 
+		   p   print the partition table 打印分区列表
+		   q   quit without saving changes  退出不保存
+		   s   create a new empty Sun disklabel 
+		   t   change a partition's system id 
+		   u   change display/entry units 
+		   v   verify the partition table 
+		   w   write table to disk and exit 保存退出
+		   x   extra functionality (experts only)
+
+
+		Command (m for help): n		表示创建新的分区
+		Command action
+		   e   extended				扩展分区
+		   p   primary partition (1-4) 主分区
+
+		Command (m for help): n 在扩展分区创建逻辑分区
+		First cylinder (2090-2610, default 2090):  起始柱面
+		Using default value 2090
+		Last cylinder or +size or +sizeM or +sizeK (2090-2610, default 2610): +2G   指定分区大小
+
+		Command (m for help): p 显示分区信息
+
+		Disk /dev/sda: 21.4 GB, 21474836480 bytes
+		255 heads, 63 sectors/track, 2610 cylinders
+		Units = cylinders of 16065 * 512 = 8225280 bytes
+
+		   Device Boot      Start         End      Blocks   Id  System
+		   /dev/sda1   *           1          13      104391   83  Linux
+		   /dev/sda2              14        1828    14578987+  83  Linux
+		   /dev/sda3            1829        2089     2096482+  82  Linux swap / Solaris
+		   /dev/sda4            2090        2610     4184932+   5  Extended
+		   			表示扩展分区
+		   /dev/sda5            2090        2333     1959898+  83  Linux
+					表示在扩展分区上创建逻辑分区
+
+		第二步：使分区生效
+			partprobe
+			[root@localhost ken]# ls /dev/sda*
+			/dev/sda  /dev/sda1  /dev/sda2  /dev/sda3  /dev/sda4  /dev/sda5
+
+			如果6.0版本，必须重启
+		第三步：建立文件系统  ext3 ext4
+			[root@localhost ken]# mkfs -t ext3 /dev/sda5
+		第四步：使用分区
+			mount /dev/sda5 /disk/   临时挂载
+		第五部：卸载挂载
+			umount /disk
+			umount /dev/sda5
+		查看挂载情况：df -h
+
+	分区三部曲：
+		分区 -> 格式化 -> 使用
+	
+	实现自动挂载：
+		vim /etc/fstab
+		LABEL=/            /              ext3    defaults        1 1
+		LABEL=/boot        /boot          ext3    defaults        1 2
+		tmpfs              /dev/shm       tmpfs   defaults        0 0
+		devpts             /dev/pts       devpts  gid=5,mode=620  0 0
+		sysfs              /sys           sysfs   defaults        0 0
+		proc               /proc          proc    defaults        0 0
+		LABEL=SWAP-sda3    swap           swap    defaults        0 0
+		设备名				挂载点       文件类型  参数			校验位
+
+	添加一行：
+		/dev/sda5         /disk          ext3    defaults        0 0
+
+	mount : 挂载：
+		格式：mount [-t type] [-o option] drivename mountname
+		-t:
+			ext2
+			ext3 linux5.5
+			ext4 linux6.0
+
+			vfat
+			fat
+			fat32
+			ntfs : windows下网络共享文件系统
+
+			iso9660 镜像文件格式
+		-o:
+			ro	: 表示只读
+			rw	: 表示读写
+			sync : 表示数据同步
+			loop : 镜像文件参数
+
+		mount -t ext3 /dev/sda5 /disk
+		mount -t nfs 172.16.1.52:/ken /mnt
+
+	模拟重启命令
+		mount -a
+	查看自动挂载是否成功 df -h
+
+	练习：
+		实现自动挂载课间
+		nfs
+
+
+
+
+
+
+
+
+
+
+

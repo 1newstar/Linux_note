@@ -1,0 +1,157 @@
+如何下载课间：
+	1 确保网络连通 ping 172.16.222.113
+	2 查看共享课间： showmount -e 172.16.222.113
+	3 挂载共享目录:
+		/mnt : 默认挂载目录
+		mount 172.16.222.113:/ken /mnt
+		检测挂载是否成功： df -h
+	4 拷贝课间到本机目录中
+		mkdir /zhangsan : 创建一个目录
+		cp /mnt/* /zhangsan -rf
+
+	5 卸载挂载目录
+		umount /mnt
+
+	练习：
+		上传作业 ip_name
+
+	安装vnc 共享远程桌面
+	1 下载
+	2 安装：[root@www tools]# rpm -ivh vnc-4.1.2-14.el5_3.1.i386.rpm
+	3 查看共享桌面：[root@www tools]# vncviewer 172.16.222.113
+	4 重启系统: init 6
+============================================================
+	linux: GNU/linux
+		官方发音：哩呐克斯
+		定义：一种类unix操作系统，确切的说是一种kernel
+			kernel :
+				1 文件系统
+				2 进程管理
+				3 内存管理
+				4 网络协议
+				5 设备驱动
+
+	unix :
+	1960 MIT -> CTSS -> 30
+	1965 MULtics -> 300 MIT BELL GE
+		AT&T -> BELL
+	1969 
+		BELL -> Ken.thompson -> unix 
+	1972 C BELL Dennis Ritchie 
+		BELL 	sysV 
+				BSD
+
+		AT&T -> AT&T
+				朗讯 -> BELL -> Novel -> SCO 
+	1989 Linus Torvalds minis unix / -> linux
+
+	1991 Richice Stallman -> GNU -> OSS(open source software) -> hurd -> linux -> GNU/linux
+===================================
+linux发行版本：
+	安装：
+		.rpm: redhat CentOS Suse fedora等
+		.dpkg: Ubuntu Debian S2D 等
+
+	查看系统版本：
+		[root@www test]# lsb_release -a
+
+	内核版本：linux
+		[root@www test]# uname -r
+		2.6.18-194.el5
+
+		2 ： 表示主版本号
+			系统架构发生变化才会升级
+		6 ： 表示次版本号
+			奇数：表示测试版本
+			偶数：表示稳定版本
+		18： 表示释放版本
+			系统存在小的BUG则会升级 -> GNU 
+
+	系统位数：
+		[root@www test]# uname -m
+		i686	表示32位操作系统
+		x86_64	表示64位操作系统
+
+
+	redhat : 红帽 侧重稳定，面向企业
+		9 fedora  侧重桌面环境
+	CentOS 	: 社区版本操作系统
+	SUSE 	: 德国著名linux操作系统
+	Debian	: 最遵循GNU规范操作系统
+	Ubuntu	: 主要是桌面和游戏首选
+	国内linux操作系统： 红旗
+=======================================
+linux安装
+	1 网络 
+	2 硬盘 
+	3 U盘
+	4 光盘
+
+	1 安装vmware
+		next
+	2 新建虚拟机
+		自定义配置 -> 内存1G 硬盘20G 光驱选中稍后安装
+	3 安装linux系统
+		1> : skip 表示不进行媒体检测
+		2> : 安装界面语言选择 -> 简体中文
+		3> : 键盘选择 -> 美国英语式
+		4> : 安装序列号 -> 跳过
+		5> : 创建分区
+			/boot : 存放系统启动镜像文件 大小：100 ~ 200M
+			swap  : 交换分区 大小：一般是内存的1.5 ~ 2倍之间
+			/	  : 根分区 大小 至少6G以上 14G
+				所有的文件都是从根开始。
+				所有设备都以文件的方式体现出来。
+		6> : grub引导界面选择 -> next
+		7> : 网卡设置 -> next
+		8> : 时区选择 -> 亚洲/上海
+		9> : 根用户密码设置 -> 123456
+		10> : 包定制：
+			开发：开发库和开发工具 全选
+			语言支持：中文和英文  全选
+		11> : 安装
+
+		启动后欢迎界面设置
+			防火墙和selinux包禁用
+
+		重启系统 init 6 
+
+
+		安装vmware-tools工具
+		1 VM -> install VMware Tools ...
+		2 弹出一个文件显示框
+		3 弹出显示框点击右键，打开终端
+		4 cp VMwareTools-8.4.4-301548.tar.gz /tmp/
+			表示复制文件到/tmp中
+		5 cd /tmp 表示切换工作目录到/tmp下
+		6 tar -xvf VMwareTools-8.4.4-301548.tar.gz
+			表示解压压缩文件
+		7 cd vmware-tools-distrib/ 表示进入押解目录中
+		8 ./vmware-install.pl 表示执行安装文件
+		9 init 6 重启系统
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+

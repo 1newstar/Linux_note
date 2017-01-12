@@ -1,0 +1,278 @@
+安装：
+	1 通过rpm直接安装 rpm -ivh 安装包路径
+	2 yum安装 createrepo -> yum list -> yum install
+	3 源码包安装 .c -> makefile 
+		./configure -> make -> make install -> make uninstall -> make clean
+	4 执行可执行命令 x
+==============================
+压缩和解压：
+	windows : rar zip
+	linux :   gzip bzip2
+
+	gzip:后缀名 .gz
+		压缩：gzip filename
+		解压：gzip -d filename
+		案例：
+			[root@aa test]# gzip passwd  会删除源文件，同时生成一个和源文件同名压缩文件
+			[root@aa test]# gzip -d passwd.gz 删除源文件，生成一个同名解压文件
+			[root@aa test]# gzip -c passwd > test.gz 保留源文件压缩
+
+			[root@aa test]# zcat test.gz 表示查看压缩文件内容
+			[root@aa test]# zless hello 表示分屏显示文件内容
+			重启终端：reset
+	bzip2 : 后缀名 bz2
+		压缩：bzip2 filename
+			
+		案例：
+			[root@aa test]# bzip2 passwd 删除源文件，生成一个同名压缩文件
+			[root@aa test]# bzip2 -d passwd.bz2
+			[root@aa test]# bzip2 -c passwd > 123.bz2
+			[root@aa test]# bzip2 -cd 123.bz2 > 11122  表示保留原压缩文件，同时生成一个新的解压缩文件名。
+			[root@aa test]# bzcat 123.bz2	表示查看.bz2格式压缩文件
+			[root@aa test]# bzless 123.bz2
+
+	比较：
+		gzip压缩文件执行效率比bzip2要高。
+			[root@aa test]# ll -h
+			总计 119M
+			drwxr-xr-x 105 root root  12K 04-15 10:07 etc
+			-rw-r--r--   1 root root 100M 04-15 10:08 etc.tar
+			-rw-r--r--   1 root root 7.4M 04-15 10:10 etc.tar.bz2
+			-rw-r--r--   1 root root  12M 04-15 10:09 etc.tar.gz
+
+		bzip2压缩文件压缩比例比gzip要高
+			[root@aa test]# time gzip -c etc.tar > etc1.tar.gz
+
+			real    0m6.550s	总时间
+			user    0m4.693s	表示调用用户态下函数时间
+			sys     0m0.964s	表示调用系统态下函数时间
+			[root@aa test]# time bzip2 -c etc.tar > etc1.tar.bz2
+
+			real    0m44.504s
+			user    0m40.693s
+			sys     0m1.479s
+====================================================
+tar : 打包命令 后缀名 .tar
+	格式：tar option dest src
+
+	option:
+		-c : 表示打包
+		-v : 表示显示打包过程
+		-f : 表示接受打包文件
+		-x : 表示解包
+		-C : 表示指定解包路径
+		-r : 表示添加文件到打包文件中
+		-t : 表示查看打包文件
+		-z : 表示通过gzip压缩并打包
+		-j : 表示通过bzip2压缩并打包
+	案例：
+		[root@aa test]# tar -cvf aa1.tar aa	表示把aa目录打包成aa1.tar
+		[root@aa test]# tar -xvf aa.tar		表示默认解压到当前目录
+		[root@aa test]# tar -xvf aa.tar -C /tmp 表示指定解压路径
+		[root@aa test]# tar -rf aa.tar a.txt 表示添加文件到打包文件中
+		[root@aa test]# tar -czvf aa.tar.bz aa 表示通过gzip压缩并打包
+		[root@aa test]# tar -cjvf aa2.tar.bz2 aa 同上
+		[root@aa test]# tar -xvf aa2.tar.bz2  万能解压
+
+
+	练习：
+		通过gzip压缩文件验证是否可以通过bzip2解压，或者相反
+		通过gzip压缩文件是否可以在通过bzip2压缩，或者相反
+========================================================
+shell编程：
+	shell是一种命令解析器，用来侦听用户输入指令，然后指令执行不同操作。
+	shell也是一门语言，也有语法规则和词法规则，也变量，关键字，流程结构等等。
+
+本机所支持shell:
+	[root@aa test]# ls /bin/*sh
+	/bin/bash  /bin/csh  /bin/ksh  /bin/sh  /bin/tcsh
+本机所使用shell:
+	[root@aa test]# echo $SHELL
+	/bin/bash
+==============================
+shell初始化过程：
+	当前用户环境：
+		~/.bashrc ~/.bash_profile
+	所有用户环境：
+		/etc/bashrc /etc/profile
+
+	[root@aa test]# su - root
+	/etc/profile
+	~/.bash_profile
+	~/.bashrc
+	/etc/bashrc
+
+	用户退出文件
+	~/.bash_logout
+
+
+	vim ~/.bash_hostory  保存终端执行命令
+==============================
+变量：不区分类型
+	局部变量：只能作用于本shell
+		案例：
+			[root@aa test]# a=123		表示定义一个局部边令
+			[root@aa test]# echo $a		表示访问变量值
+			123
+	查看局部变量：set
+
+	环境变量：即能被本shell所访问，也能被子shell所访问
+		案例：
+			[root@aa test]# export b=hello 表示定义一个环境变量
+			[root@aa test]# echo $b			表示本shell访问
+			hello
+			[root@aa test]# bash			表示进入子shell
+			~/.bashrc
+			/etc/bashrc
+			[root@aa test]# echo $b			表示子shell访问
+			hello
+	查看所有环境变量：env
+
+取变量值：
+	$varname 不安全
+	${varname}
+数值运算：
+	+ - * / % **(立方)
+	$[] 或者 $(())
+
+字符串：
+	等于 	=
+	不等于：!=
+	大于  ：\>
+	小于  ：\<
+比较运算符：
+				c		bash
+	大于	：	>		-gt
+	大于等于：  >=		-ge
+	小于	：	<		-lt
+	小于等于：	<=		-le
+	等于	：	==		-eq
+	不等于	：	!=		-ne
+
+
+练习：
+
+	模拟实现网吧收费系统
+		tom总共登录XX小时XX分钟XX秒 
+	
+===========================
+如何实现shell脚本
+	1 创建shell脚本文件
+		touch hello.sh
+	2 编写shell脚本语言
+		#!/bin/bash		表示下面的所有命令都是通过bash来解析
+		echo "hello"
+	3 指定可执行权限
+		chmod 0755 hello.sh
+
+shell传参：
+	$1	:	表示第一个参数
+	$2	:	表示第二个参数
+	$n 	:	表示第n个参数
+	$#	:	表示参数个数
+	$$	:	表示进程号
+			ps -ef 	| grep filename : 表示查找匹配的进程号
+			kill -9 pid				: 表示杀死进程
+	$?	:	表示查看上次命令是否执行成功
+			成功：0
+			失败：非零
+	练习：模拟服务运行状态
+
+===========================
+输入输出语句
+	输出语句：echo
+		不换行 -n
+	输入语句：read
+		read option 
+		-p : 表示显示提示信息
+		-s : 表示隐藏输入信息
+		-t n : 表示延迟5秒
+		-n n : 表示指定接受字符
+===============================
+流程结构
+	选择结构：
+	格式一：
+		if [ con ]
+		then
+			cmd
+		fi
+	如果con满足，则执行then下语句，如果不满足，则退出
+
+	练习：输入两个数，求出最大数
+	
+	格式二：
+		if [ con ]
+		then
+			cmd_true
+		else
+			cmd-fialed
+		fi
+
+	练习：输入一个数，求绝对值
+	
+	if cmd（命令）
+	then
+	fi
+
+	练习：检测服务运行状态，并打印
+
+	 if filename
+	 then
+	 fi
+
+	-e filename	:	判断文件是否存在
+	-f filenama : 	判断文件是否存在，如果存在且是一个普通文件
+	-d filename :	判断文件是否存在，如果存在且是一个目录文件
+	-b filename : 	判断文件是否存在，如果存在且是一个块设备文件
+	-c filename :	判断文件是否存在，如果存在且是一个字符设备文件
+
+	-r filename	:	判断文件对属主文件是否有读权限
+	-w filename :	判断文件对属主文件是否有写权限
+	-x filename :	判断文件对属主文件是否有可执行权限
+
+	-O filename : 	判断文件是否存在，且当前用户是否为其属主
+	-G filename :   判断文件是否存在，且当前用户组是否为其属组
+
+	格式三： if嵌套
+		if [ con ]
+		then
+			if [ con ]
+			then
+				cmd_true
+				.........
+			else
+				cmd_failed
+				...........
+			fi
+			............
+		else
+			if [ con ]
+			then
+				cmd_true
+				.........
+			else
+				cmd_failed
+				...........
+			fi
+		fi
+		
+	练习： 	1 判断文件是否存在，并输出属主对文件权限 ?
+
+			2 输入一个年份，判断是否是闰年
+				能被400整除或者能被4整除但不可以被100整除就是闰年
+
+
+	homework:
+		1 实现自动上传和下载功能
+		2 输入坐标，判断象限
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,316 @@
+fdisk:
+	第一步：分区 fdisk /dev/sda
+		m -> n -> size -> p -> w
+	第二步：分区生效
+		partprobe
+	第三步：分区建立文件系统 ext3
+		mkfs -t ext3 /dev/sda5
+	第四步：使用分区
+		mount /dev/sda5 /disk
+	第五步：卸载分区
+		umount /disk
+
+mount:挂载
+	挂载ext3格式
+	挂载nfs格式
+	挂载iso镜像文件
+		mount -t iso9660 -o loop /tools/rhel55.iso /iso
+
+	练习：
+		实现iso镜像自动挂载
+========================================
+linux网络管理：
+	mii-tool: 检查网络设备
+		no MII ： 表示网卡驱动有问题，或者网卡松动
+		no link : 表示网线有问题
+		link ok : 表示网络可以连接
+	ifconfig : 查看所有网卡信息：
+		eth0 : 表示第一张网卡
+		eth1 : 表示第二张网卡
+		wlan : 表示无线网卡
+	ifconfig eth0 : 表示查看第一张网卡
+		ifconfig eth0 172.16.1.119  表示设置ip地址  临时设置ip地址
+		ifconfig eth0 down			表示关闭第一张网卡
+		ifconfig eth0 up			表示开启第一张网卡
+
+	service network restart
+	
+	ip地址永久生效：
+		vim /etc/sysconfig/network-scripts/ifcfg-eth0 第一张网卡配置文件
+
+	图形界面网卡配置
+		system-config-network 
+
+		# Advanced Micro Devices [AMD] 79c970 [PCnet32 LANCE]  注释
+		DEVICE=eth0					设备名
+		BOOTPROTO=none				ip分配方式
+									static : 静态
+									dhcp   : 动态
+		HWADDR=00:0C:29:08:96:7D	物理地址
+		ONBOOT=yes					是否启动这张网卡
+									yes : 表示启动
+									no  : 表示不启动
+		NETMASK=255.255.0.0			表示子网掩码
+		GATEWAY=172.16.255.255		表示默认网关
+		IPADDR=172.16.1.52			表示ip地址
+		TYPE=Ethernet				以因特网方式来访问网络
+	重启网络服务service network restart
+
+
+	设置DNS:
+		/etc/resolv.conf
+			添加一行：nameserver 2.2.1.1
+
+	ping : 检测是否可以ping通网络
+		ping serviceIP -c num
+			-c : 指定ping次数 
+		64 bytes from 172.16.1.52: icmp_seq=1 ttl=64 time=0.679 ms
+		64 bytes from 172.16.1.52: icmp_seq=2 ttl=64 time=0.090 ms
+		64 bytes from 172.16.1.52: icmp_seq=3 ttl=64 time=0.049 ms
+		表示可以连通
+		64 bytes			： 表示ping包大小
+		from 172.16.1.52 	： 表示源ip地址
+		icmp				： 表示发送数据报协议
+		seq=1				： 表示发送次数
+		ttl=64				： 表示生存周期
+		time=0.679 ms		： 表示反应时间
+
+		From 172.16.1.52 icmp_seq=2 Destination Host Unreachable
+		From 172.16.1.52 icmp_seq=3 Destination Host Unreachable
+		From 172.16.1.52 icmp_seq=4 Destination Host Unreachable
+		表示不通
+		终止命令执行：ctrl + c
+
+	scp : 网络拷贝
+		scp 172.16.1.74:/etc/passwd ./ 拷贝服务文件到本机
+		[root@localhost test]# scp ./hello 172.16.1.74:/tmp 由服务器到客户端
+		scp 172.16.1.74:/tmp/hello 172.16.1.80:/tmp 由客户端到客户端
+	ssh : 远程登录
+		ssh ip
+		1 可以ping通要连接主机 
+		2 要知道用户名及密码
+		3 来开启sshd服务
+			service sshd restart
+
+	service : 启动服务命令：只是针对红帽操作系统
+		实现nfs服务：linux下网络共享服务 为例
+
+		service nfs restart		: 表示重启nfs服务
+		service nfs start		: 表示启动nfs服务
+		service nfs stop		: 表示关闭nfs服务
+		service nfs status		: 表示查看nfs服务状态
+
+		/etc/init.d/nfs restart : 重启nfs服务
+						start	:
+						stop	:
+						status	:
+	设置服务启动信息 setup
+			选中或者关闭服务: 通过空格键
+
+
+==============================
+linux服务管理：
+	nfs 	: 网络共享服务 实现linux之间文件共享
+	http 	: 超文本连接服务 实现linxu和windows之间的文件共享
+
+	nfs服务： .rpm
+
+	服务器：
+	1 需要安装nfs包源 -> .iso
+		首先挂载起来
+		Server	： 表示基本服务安装包
+		VT		： 表示虚拟华安装包
+		Cluster	： 表示集群安装包
+		ClusterStorage	：表示集群存储安装包
+
+		为了解决包之间依赖，需要yum安装
+		配置yum
+			1> : 修改配置文件： /etc/yum.repos.d/rhel-debuginfo.repo
+
+			[rhel-debuginfo]  表示标签
+			name=Red Hat Enterprise Linux $releasever - $basearch - Debug
+				表示名称，可以随意命名
+			baseurl=ftp://ftp.redhat.com/pub/redhat/linux/enterprise/$releasever/en/os/$basearch/Debuginfo/
+				表示包存放路径  一定要绝对路径
+				ftp:// 	表示通过ftp服务共享文件
+				http://	表示http共享文件
+				file:// 表示本机文件
+			enabled=0	表示是否启动
+					1 ： 表示启动
+					0 ： 表示不开启
+			gpgcheck=1	表示校验位
+					1 : 表示校验
+					0 : 表示不校验
+
+			案例：
+				[Server]
+				name=Server
+				baseurl=file:///iso/Server
+				enabled=1
+				gpgcheck=0
+
+				[VT]
+				name=VT
+				baseurl=file:///iso/VT
+				enabled=1
+				gpgcheck=0
+
+				[Cluster]
+				name=Cluster
+				baseurl=file:///iso/Cluster
+				enabled=1
+				gpgcheck=0
+
+				[ClusterStorage]
+				name=ClusterStorage
+				baseurl=file:///iso/ClusterStorage
+				enabled=1
+				gpgcheck=0
+
+			2> :加载yum
+				yum clean all 清空yum
+				yum list	加载
+	2 安装nfs服务
+		yum install nfs*  表示安装，如果已经安装过，则直接跳出
+		yum reinstall nfs* 表示重新安装.
+		yum reinstall nfs* -y : 表示无需确认安装
+	 	卸载nfs服务
+		yum erase nfs
+	
+	3 配置nfs文件信息
+		/etc/exports
+		格式：
+			共享目录 客户端(参数)
+			客户端：
+				* : 表示所有用户
+				172.168.1.* : 表示只允许1网段的用户访问
+				172.168.1.74 : 表示只允许74用户访问
+			参数：
+				ro : 表示只读方式
+				rw : 表示读写方式
+				sync : 表示数据同步
+				loop : 表示iso镜像文件
+	4 重启nfs服务
+		service nfs restart
+	
+	注意：
+		如果依然无法访问，则检查防火墙和selinux包是否关闭
+		查看防火墙状态：
+			chkconfig --list iptables
+		开启防火墙
+			chkconfig --level 0123456 iptables on
+		关闭防火墙
+			chkconfig --level 0123456 iptables off
+		selinux包
+			/etc/selinux/config
+			修改为SELINUX=disabled
+	
+
+	客户端：
+		1 ping ip		表示看网络是否通顺
+		2 showmount 	表示看nfs服务是否启动
+		3 mount			表示挂载共享目录
+		4 cp			表示拷贝共享文件
+		5 umount 		表示卸载挂载
+
+	帮定主机名和ip地址
+		172.16.1.52  
+
+	上传文件
+		1 指定配置文件参数 rw
+		2 指定共享目录必须有w权限 chmod 0777 /homework
+
+	练习：
+		同桌之间相互实现nfs服务，并且可以上传文件
+===========================================
+http服务：超文本连接服务
+	实现linux和windows之间文件共享
+	服务器名：httpd
+	服务端口：80
+	
+	服务器：
+	1 安装httpd服务
+		yum install httpd*
+	2 配置httpd文件
+		/etc/httpd/conf/httpd.conf
+		DocumentRoot "/var/www/html" 修改为共享目录
+				DocumentRoot "/ken"
+		<Directory /ken>		表示容器开始
+			Options FollowSymLinks	Indexes 表示显示方式 列表方式显示
+				其中Indexes 表示显示共享方式为列表
+			AllowOverride All 表示允许用户访问
+		</Directory>			表示容器结束
+
+		同时打开欢迎界面配置文件：/etc/httpd/conf.d/welcome.conf
+
+		<LocationMatch "^/+$">
+			Options Indexes 去掉中间-
+			ErrorDocument 403 /error/noindex.html
+		</LocationMatch>
+
+	
+	3 重启服务：
+		service httpd restart
+	
+
+	客户端访问
+		firefox 172.16.1.52 &
+
+		访问如果出现403报错信息 则说明403这个端口被其他服务所使用
+		则服务器需要修改这个端口信息
+		<LocationMatch "^/+$">
+			Options Indexes 去掉中间-
+			ErrorDocument 403 /error/noindex.html 修改403端口为其他端口
+		</LocationMatch>
+
+	创建多个虚拟服务
+		1 打开httpd配置文件
+
+		NameVirtualHost *:80  打开虚拟端口
+
+
+		容器
+		<VirtualHost *:80>	开始
+		    ServerAdmin webmaster@dummy-host.example.com 服务管理邮箱
+		    DocumentRoot /www/docs/dummy-host.example.com 共享目录
+		    ServerName dummy-host.example.com			域名空间
+		    ErrorLog logs/dummy-host.example.com-error_log	错误信息
+		    CustomLog logs/dummy-host.example.com-access_log common 错误信息
+		</VirtualHost> 结束
+
+
+		案例：
+		#www.tools.com -> tools
+		<VirtualHost *:80>
+			ServerAdmin webmaster@tools.com
+			DocumentRoot /tools
+			ServerName www.tools.com
+			ErrorLog logs/tools.com-error_log
+			CustomLog logs/tools.com-access_log common
+		</VirtualHost>
+		#www.homework.com -> homework
+		<VirtualHost *:80>
+			ServerAdmin webmaster@homework.com
+			DocumentRoot /homework
+			ServerName www.homework.com
+			ErrorLog logs/homework.com-error_log
+			CustomLog logs/homework common
+		</VirtualHost>
+		
+		客户端帮定服务器ip
+			172.16.1.52 www.tools.com
+			172.16.1.52 www.homework.com
+
+            vim /etc/hosts
+
+
+
+	
+
+
+
+
+
+
+
+

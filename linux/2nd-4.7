@@ -1,0 +1,249 @@
+安装：
+	分区：
+		/boot
+		swap
+		/
+	包定制：
+		开发：
+			开发库
+			开发工具  -> 全选
+		语言选择：
+			中文选择：
+			英文选择 -> 全选
+
+＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+	防火墙：
+		[root@localhost test]# chkconfig --list iptables 查看防火墙状态
+		[root@localhost test]# chkconfig --level 0123456 iptables off 关闭防火墙
+		[root@localhost test]# chkconfig --level 0123456 iptables on 开启防火墙
+	selinux安全包
+		[root@localhost test]# vim /etc/selinux/config 打开配置文件
+		修改SELINUX=enabled 为 disabled
+		按i 进入编辑模式 －> ESC键进入一般模式 -> :进入命令行模式 -> wq(保存并退出)。
+=======================================
+桌面环境：
+	打开终端：
+		1 点击右键 -> 打开终端
+			打开终端默认工作目录是当前用户家目录
+		2 alt + F2 -> gnome-terminal 
+		3 应用程序 -> 附件 -> 终端
+
+	在一个终端打开多个标签
+		ctrl + shift + t : 快速打开一个标签
+		标签之间切换： alt + num
+	
+	关闭终端：exit
+
+	放大字体：ctrl + shift + +
+	缩小字体：ctrl + -
+	窗口最大化: alt + F10
+	窗口最小化：alt + F9
+
+	进入字符界面：
+	ctrl + alt + F1 ~ F6
+	图形界面：
+	ctrl + alt + F7
+
+	清屏：	ctrl + l
+			clear
+	
+	关机：init 0 | shutdown -h now
+	重启：init 6 | reboot | shutdown -r now
+	
+	shutdown -h +30	& 表示半小时候关机
+	& 表示进程放在后台运行
+	ps -ef : 查看所有后台进程
+	kill -9 pid : 表示杀死进程号为pid的进程
+
+	shutdown -h 18:00 表示指定某一个时间点关机
+＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+	目录详解：
+	/	: 根目录
+		所有的文件都是从根开始的
+	/bin : 存放二进制可执行基本命令
+	/etc : 存放配置文件信息
+		/etc/passwd ：用户帐号文件信息
+	/media : 挂载目录 挂载光盘 优盘 硬盘
+	/root  : 表示根用户家目录
+		root 管理员用户
+		/root/Desktop/ 表示桌面
+	/home  : 普通用户家目录
+	/tftpboot : 表示tftp服务文件目录
+	/boot	: 存放镜像文件
+	/lib	: 存放库文件目录
+		动态库：.so
+		静态库：.a
+	/sbin	: 存放管理使用命令
+	/sys
+	/proc	: 虚拟目录
+		cat /proc/cpuinfo 查看CPU信息
+		cat /proc/meminfo 查看内存信息
+		cat /proc/version 查看系统版本信息
+
+	/tmp	: 临时文件目录
+	/dev	: 存放设备目录
+								c			sys
+		标准输入：键盘 鼠标		stdin		0
+		标准输出：显示器 打印机	stdout		1
+		错误输出：显示器 打印机	stderr		2
+	/mnt	: 系统默认挂载目录
+	/usr	: 用户安装文件目录
+＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+linux基本命令
+	命令分类：
+		内部命令：就是shell自带的一些命令，同时这些命令是没有路径
+		外部命令：就是用户自己安装一些命令，命令就会有路径(/bin, /sbin, /usr/bin, /usr/sbin 等)
+
+		如何区分是内部命令还是外部命令：
+		type + cmd
+		type ls : 显示ls是一个别名
+		查看外部命令路径
+		which + cmd:
+		[root@localhost /]# which ls
+		alias ls='ls --color=tty'
+		        /bin/ls			显示ls是一个外部命令
+		[root@localhost /]# type fdisk 
+		fdisk is hashed (/sbin/fdisk)	表示fdisk是一个外部命令
+
+		[root@localhost /]# type cd
+		cd is a shell builtin		表示cd是一个内部命令
+		[root@localhost /]# which cd  查找不到命令路径
+		/usr/bin/which: no cd in (/usr/kerberos/sbin:/usr/kerberos/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/X11R6/bin:/root/bin)
+		表示echo既是一个内部命令也是一个外部命令
+		[root@localhost /]# type echo
+		echo is a shell builtin
+		[root@localhost /]# which echo
+		/bin/echo
+
+		echo : 输出语句 默认输出显示器
+=========================
+	tab键使用：
+		1 对命令自动补齐
+		2 对文件自动补齐
+			/etc/sysconfig/network-scripts/ifcfg-eth0 网卡配置文件
+			
+		ctrl + c : 表示终止命令执行
+=============================
+man命令
+	格式：
+		man + cmd
+
+		man 9本手册：
+		1 Commands	：	表示基本命令
+		2 System calls	：	表示系统调用函数
+		3 Library calls	：	表示C库函数 数学库 第三库
+		4 Special files ： 	表示特殊文件说明文档 块设备 字符设备
+		5 File formats and conventions	：表示文件格式及配置信息文件说明文档
+		6 Games			：	表示游戏相关说明文档
+		7 Conventions and miscellaneous	：表示网络相关说明文档
+		8 System management commands	：表示系统管理员使用命令
+		9 Kernel routines		： 表示内核相关说明文档
+
+	退出man命令：q
+help:
+	外部命令：cmd --help
+	内部命令：help cmd
+info:
+	info + cmd
+百度 谷歌
+===================================
+ls : 显示当前目录下包含信息（文件或者目录）
+	格式：cmd [option] ... [filename] ...
+	option:
+		-a: 表示显示所有文件信息(包括隐藏文件和.跟..)
+			.filename 	: 隐藏文件
+			.			: 表示当前工作目录
+			..			: 表示上级目录
+		-A: 表示显示隐藏文件和普通文件(除了.和..不显示)
+		-i: 文件的inode节点来识别文件(计算机) 或者叫文件索引号
+		-l: 表示长格式显示文件信息
+		[root@localhost test]# ls -l
+		总计 16
+		-rw-r--r-- 1 root root  154 04-07 15:08 1.c
+		drwxr-xr-x 2 root root 4096 04-07 15:02 aa
+		-rwxr-xr-x 1 root root 5173 04-07 11:15 a.out
+		第一列：表示文件类型和权限
+			第一列第一个字符表示文件类型
+				-	: 表示普通文件
+				d	: 表示目录文件
+				c	: 表示字符设备类文件
+				l	: 表示链接文件
+				b	: 表示块设备类文件
+				p	: 表示管道文件
+					mkfifo filename
+					echo hello > ken  	写端
+					cat ken				读端
+				s	: 表示套接子文件 网络通讯 socket
+			第一列的第二个字符到第十个字符表示文件权限
+				r	: 表示只读
+				w	: 表示只写
+				x	: 表示可执行
+				-	: 表示无权限
+				三位为一组：
+				第一组：表示属主对文件权限
+				第二组：表示属组对文件权限
+				第三组：表示其他用户对文件权限
+
+		第二列：表示文件硬链接数
+			硬链接：
+				创建硬链接：ln srcfile destfile
+				1 相当给文件做一个备份，如果修改任意一个文件，硬链接的所有文件都会改变，同时删除任意一个硬链接不会影响到其他文件。
+				2 文件inode节点是一样的
+				3 不能对目录操作
+				4 硬链接不可以跨分区
+			软链接：
+				创建软链接：ln -s src dest
+				1 相当创建一个快捷方式 删除源文件，则软链接文件不可以访问
+				2 文件inode节点不一样。
+				3 可以对目录操作
+				4 可以创建成功，但是无法访问
+
+		第三列：表示文件拥有者 属主
+			
+		第四列：表示文件拥有组 属组
+
+		第五列：表示文件大小 字节
+			-h : 表示易读的方式显示文件大小
+		第六列：表示文件时间(修改文件内容)
+			atime:访问时间
+			mtime:修改文件内容时间 同时触发atime 和 ctime
+			ctime:修改文件属性(权限 属主 属组)
+
+			stat : 查看文件属性
+
+		第七列：表示文件名
+	ll => ls -l
+
+
+
+
+
+
+
+
+
+
+		
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

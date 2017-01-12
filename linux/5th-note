@@ -1,0 +1,35 @@
+
+复习：
+
+用户信息文件：
+	/etc/passwd
+	/etc/shadow
+	/etc/group
+	/etc/gshadow
+	useradd -> passwd -> userdel -r -> usermod -> su - username
+		创建用户会创建同名的用户组
+	groupadd -> gpasswd -> groupdel -> groupmod -> groups
+		创建用户组不会创建用户
+
+	groups : 查看用户属于哪个用户组
+	[root@localhost test]# groups tom
+	tom : tom xiami
+
+	chmod :
+		u	g	o	a,	+	-	=
+
+	chown u:g filename (dirname)
+
+	用户ID最大可以是多少
+
+	怎么用修改配置文件的方法修改chown chmod
+
+	默认创建文件的权限是 644
+	默认创建目录的权限是 755
+	默认权限： umask	q
+
+
+磁盘管理：
+
+
+
